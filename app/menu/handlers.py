@@ -11,10 +11,15 @@ def crete_component_handler():
         return
     try:
         amount = input('Enter amount')
-        return
     except (ValueError, TypeError):
         print('Wrong amount')
-    component_service.crete_component(name=name, price=price, amount=amount)
+        return
+    component = component_service.crete_component(
+        name=name,
+        price=price,
+        amount=amount,
+    )
+    print(component)
 
 
 def shut_down():
@@ -26,12 +31,18 @@ def help_handler():
     print("""You are using pharmacy database 
                  You can enter:
                  
-                 hekp - (but you are here)
+                 help - (but you are here)
                  exit - to close the program""")
+    print_availiable_handlers()
 
 
 COMMANDS = {
-    'create_order': crete_component_handler,
+    'crete_component': crete_component_handler,
     'exit': shut_down,
     'help': help_handler,
 }
+
+
+def print_availiable_handlers():
+    for i in COMMANDS.keys():
+        print(i)

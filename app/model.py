@@ -35,7 +35,7 @@ class Client(Base):
     age = sa.Column(sa.SmallInteger)
 
     def __repr__(self):
-        pass
+        return f'Client(id={self.id}, first_name={self.first_name,}, last_name={self.last_name})'
 
 
 class Medicine(Base):
@@ -55,6 +55,9 @@ class Medicine(Base):
     )
     type = sa.Column(sa.Enum(MedicineType))
 
+    def __repr__(self):
+        return f'Medicine(id={self.id}, name={self.name})'
+
 
 class Order(Base):
     __tablename__ = 'orders'
@@ -66,7 +69,13 @@ class Order(Base):
     client = relationship('Client')
     medicine_id = sa.Column(sa.Integer, sa.ForeignKey('medicine.id'))
     medicine = relationship('Medicine')
-    date_created = sa.Column(sa.Date, nullable=False, default=datetime.date.today)
+    date_created = sa.Column(sa.Date, nullable=False,
+                             default=datetime.date.today)
+
+    def __repr__(self) -> str:
+        return (
+            f'Order(id={self.id}, status={self.status}, medicine_id={self.medicine_id}, date_created={self.date_created})'
+        )
 
 
 class CookingBook(Base):
@@ -78,6 +87,9 @@ class CookingBook(Base):
     medicine_id = sa.Column(sa.Integer, sa.ForeignKey('medicine.id'))
     method = sa.Column(sa.Enum(CookingMethod))
 
+    def __repr__(self):
+        return f'CookingBook(id={self.id}, medicine_id={self.medicine_id})'
+
 
 class CriticalNorm(Base):
     __tablename__ = 'critical_norm'
@@ -85,6 +97,9 @@ class CriticalNorm(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     component_id = sa.Column(sa.Integer, sa.ForeignKey('component.id'))
     amount = sa.Column(sa.Float)
+
+    def __repr__(self):
+        return f'CriticalNorm(id={self.id}, component_id={self.component_id}, amount={self.amount})'
 
 
 class Component(Base):
@@ -94,6 +109,9 @@ class Component(Base):
     name = sa.Column(sa.String(120), unique=True)
     price = sa.Column(sa.Float)
     amount = sa.Column(sa.Float)
+
+    def __repr__(self):
+        return f'Component(id={self.id}, name={self.name}, price={self.price}, amount={self.amount})'
 
 
 class Recipe(Base):
@@ -109,6 +127,9 @@ class Recipe(Base):
     ready_time = sa.Column(sa.Date)
     order_id = sa.Column(sa.Integer, sa.ForeignKey('orders.id'))
 
+    def __repr__(self):
+        return f'Recipe(id={self.id}, medicine_name={self.medicine_name}, client_id={self.client_id}, ready_time={self.ready_time})'
+
 
 class SupplyRequest(Base):
     __tablename__ = 'supply_request'
@@ -118,6 +139,9 @@ class SupplyRequest(Base):
     client_id = sa.Column(sa.Integer, sa.ForeignKey('client.id'))
     client = relationship('Client')
 
+    def __repr__(self):
+        return f'SupplyRequest(id={self.id}, component_id={self.component_id}, client_id={self.client_id})'
+
 
 class Ingredient(Base):
     __tablename__ = 'ingredient'
@@ -126,3 +150,6 @@ class Ingredient(Base):
     component_id = sa.Column(sa.Integer, sa.ForeignKey('component.id'))
     component = relationship('Component')
     dose = sa.Column(sa.Float)
+
+    def __repr__(self):
+        return f'Ingredient(id={self.id}, component_id={self.component_id}, dose={self.dose})'

@@ -34,6 +34,9 @@ class Client(Base):
     address = sa.Column(sa.String(120))
     age = sa.Column(sa.SmallInteger)
 
+    def __repr__(self):
+        pass
+
 
 class Medicine(Base):
     __tablename__ = 'medicine'

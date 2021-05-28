@@ -9,7 +9,6 @@ from app.services import ingredient as ingredient_service
 from app.services import critical_norm as cn_service
 from app.services import medicine as medicine_service
 from app.services import order as order_service
-from app.services import supply_request as sr_service
 from app.services import recipe as recipe_service
 from app.lib import query as q
 
@@ -56,18 +55,18 @@ def create_client_handler():
 
 def create_ingredient_handler():
     try:
-        component_id = input('Enter component id')
+        component_id = int(input('Enter component id'))
     except (ValueError, TypeError):
         print('Wrong component id')
         return
     try:
-        amount = input('Enter amount')
+        dose = int(input('Enter amount'))
     except (ValueError, TypeError):
         print('Wrong amount')
         return
     ingredient = ingredient_service.add_ingredient(
         component_id=component_id,
-        dose=amount,
+        dose=dose
     )
     print(ingredient)
 
@@ -100,9 +99,10 @@ def create_medicine_handler():
     print(medicine)
 
 
-def create_order_handler():
-    recipe = input('Enter recipe')
-    medicine = input('Enter medicine')
+def create_recipe_handler():
+    doctor = input('Enter doctor')
+    client_id = input('Enter client id')
+
     try:
         ready_time = input('Enter ready time')
     except (ValueError, TypeError):
@@ -114,16 +114,6 @@ def create_order_handler():
         status=OrderStatus.in_process
     )
     print(order)
-
-
-def create_supply_request_handler():
-    component_id = input('Enter component id')
-    client_id = input('Enter client id')
-    supply_request = sr_service.create_supply_request(
-        component_id=component_id,
-        client_id=client_id,
-    )
-    print(supply_request)
 
 
 def set_component_amount_handler():
@@ -239,14 +229,107 @@ def help_handler():
     print("""""")
 
 
+# 1
+def get_clients_with_not_taken_orders_handler():
+    res = q.get_clients_with_not_taken_orders()
+    for item in res:
+        print(item)
+
+
+# 2
+def get_clients_waiting_for_ingredients_handler():
+    res = q.get_clients_waiting_for_ingredients()
+    for item in res:
+        print(item)
+
+
+# 3
+def get_top_ten_most_used_medicines_handler():
+    res = q.get_top_ten_most_used_medicines()
+    for item in res:
+        print(item)
+
+
+# 6
+def get_components_with_critical_norm_handler():
+    res = q.get_components_with_critical_norm()
+    for item in res:
+        print(item)
+
+
+# 7
+def get_medicine_with_minimal_components_amount_handler():
+    type_ = input('Enter type')
+    print(q.get_medicine_with_minimal_components_amount(type_))
+
+
+# 8
+def get_orders_amount_in_process_status_handler():
+    res = q.get_orders_amount_in_process_status()
+    for item in res:
+        print(item)
+
+
+# 9
+def get_medicine_in_waiting_for_components_status_handler():
+    res = q.get_medicine_in_waiting_for_components_status()
+    for item in res:
+        print(item)
+
+
+# 10
+def get_cooking_book_for_medicine_name_handler():
+    name = input('Enter name')
+    print(q.get_cooking_book_for_medicine_name(name))
+
+
+def get_cooking_book_for_medicine_type_handler():
+    type_ = input('Enter type')
+    print(q.get_cooking_book_for_medicine_type(type_))
+
+
+# 11
+def get_price_for_medicine_handler():
+    try:
+        id_ = int(input('Enter id'))
+    except (ValueError, TypeError):
+        print('Error')
+        return
+    print(q.get_price_for_medicine(id_))
+
+
+def get_component_price_for_medicine_handler():
+    try:
+        id_ = int(input('Enter id'))
+    except (ValueError, TypeError):
+        print('Error')
+        return
+    print(q.get_component_price_for_medicine(id_))
+
+
+# 12
+def get_orders_for_most_popular_medicine_handler():
+    res = q.get_orders_for_most_popular_medicine()
+    for item in res:
+        print(item)
+
+
+# 13
+def get_full_medicine_info_handler():
+    try:
+        id_ = int(input('Enter id'))
+    except (ValueError, TypeError):
+        print('Error')
+        return
+    print(q.get_full_medicine_info(id_))
+
+
 COMMANDS = {
     '------------ create commands ------------': 1,
     'create client': create_client_handler,
     'create component': create_component_handler,
     'create ingredient': create_ingredient_handler,
     'create medicine': create_medicine_handler,
-    'create order': create_order_handler,
-    'create supply request': create_supply_request_handler,
     '------------ set commands ------------': 2,
     'set component amount': set_component_amount_handler,
     'set ingredient dose': set_ingredient_dose_handler,
@@ -262,9 +345,19 @@ COMMANDS = {
     'get all medicines': get_all_medicines,
     'get all orders': get_all_orders,
     '------------ queries ------------': 4,
-    'get_clients_with_not_taken_orders': q.get_clients_with_not_taken_orders,
-    'get_clients_waiting_for_ingredients': q.get_clients_waiting_for_ingredients,
-    'get_top_ten_most_used_medicines': q.get_top_ten_most_used_medicines,
+    'get clients with not taken orders': get_clients_with_not_taken_orders_handler,  # 1
+    'get clients waiting for ingredients': get_clients_waiting_for_ingredients_handler,  # 2
+    'get top ten most used medicines': get_top_ten_most_used_medicines_handler,  # 3
+    'get components with critical norm': get_components_with_critical_norm_handler,  # 6
+    'get medicine with minimal components amount': get_medicine_with_minimal_components_amount_handler,  # 7 ?
+    'get orders amount in process status': get_orders_amount_in_process_status_handler,  # 8
+    'get medicine in waiting for components status': get_medicine_in_waiting_for_components_status_handler,  # 9
+    'get cooking book for medicine name': get_cooking_book_for_medicine_name_handler,  # 10 ?
+    'get cooking book for medicine type': get_cooking_book_for_medicine_type_handler,
+    'get price for medicine': get_price_for_medicine_handler,  # 11
+    'get component price for medicine': get_component_price_for_medicine_handler,
+    'get orders for most popular medicine': get_orders_for_most_popular_medicine_handler,  # 12 ?
+    'get full medicine info': get_full_medicine_info_handler,  # 13
     '------------ system commands ------------': 5,
     'exit': shut_down,
     'help': help_handler,

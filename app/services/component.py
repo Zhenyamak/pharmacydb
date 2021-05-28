@@ -4,7 +4,7 @@ from app.model import Component
 from app.services.db import session
 
 
-def crete_component(name: str, price: float, amount: float) -> Component:
+def create_component(name: str, price: float, amount: float) -> Component:
     com = Component(name=name, price=price, amount=amount)
     session.add(com)
     session.commit()
@@ -16,10 +16,10 @@ def get_ingredient_by_id(id_: int) -> Optional[Component]:
     return component
 
 
-def set_ingredient_amount(component_id: int, amount: int) -> None:
+def set_component_amount(component_id: int, amount: int) -> None:
     (
         session.query(Component)
-        .filter(id == component_id)
+        .filter(Component.id == component_id)
         .update({'amount': amount})
     )
     session.commit()

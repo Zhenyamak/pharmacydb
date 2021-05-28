@@ -32,12 +32,12 @@ def create_recipe(
 
 
 def set_order_id(id_: int, order_id: int):
-    session.query(Recipe).filter(id == id_).update({'order_id': order_id})
+    session.query(Recipe).filter(Recipe.id == id_).update({'order_id': order_id})
     session.commit()
 
 
 def set_ready_time(id_: int, ready_time: date):
-    session.query(Recipe).filter(id == id_).update(
+    session.query(Recipe).filter(Recipe.id == id_).update(
         {'ready_time': ready_time}
     )
     session.commit()

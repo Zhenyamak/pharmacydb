@@ -25,7 +25,7 @@ def get_ingredient_by_id(id_: int) -> Optional[Ingredient]:
 def set_ingredient_dose(id_: int, dose: int) -> None:
     (
         session.query(Ingredient)
-        .filter(id == id_)
+        .filter(Ingredient.id == id_)
         .update({'dose': dose})
     )
     session.commit()

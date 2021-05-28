@@ -4,11 +4,11 @@ from app.services.db import session
 
 def create_supply_request(
     component_id: int,
-    clinent_id: int,
+    client_id: int,
 ) -> SupplyRequest:
     sup_request = SupplyRequest(
         component_id=component_id,
-        clinent_id=clinent_id,
+        client_id=client_id,
     )
     session.add(sup_request)
     session.commit()

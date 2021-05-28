@@ -1,6 +1,7 @@
 from typing import Optional
 from datetime import date
 
+from app.model import Client
 from app.model import Recipe
 from app.services.db import session
 from app.lib.enums import ConsumptionType
@@ -16,6 +17,9 @@ def create_recipe(
     order_id: Optional[int] = None,
     ready_time: Optional[date] = None,
 ) -> Recipe:
+    client = session.query(Client).filter(Client.id == client_id).exists()
+    if not client:
+        return None
     recipe = Recipe(
         doctor=doctor,
         client_id=client_id,

@@ -6,11 +6,11 @@ from app.services.db import session
 
 def add_ingredient(
     component_id: int,
-    amount: int,
+    dose: int,
 ) -> Ingredient:
     ingredient_record = Ingredient(
         component_id=component_id,
-        dose=amount,
+        dose=dose
     )
     session.add(ingredient_record)
     session.commit()

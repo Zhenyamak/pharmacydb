@@ -3,7 +3,6 @@ from datetime import date
 
 
 from app.model import Medicine
-from app.model import Component
 from app.services.db import session
 from app.lib.enums import MedicineType
 from app.lib.enums import CookingMethod

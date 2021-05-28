@@ -1,4 +1,5 @@
 from app.model import CriticalNorm
+from app.model import Component
 from app.services.db import session
 
 
@@ -6,6 +7,9 @@ def create_critical_norm(
     component_id: int,
     amount: float,
 ) -> CriticalNorm:
+    component = session.query(Component).filter(Component.id == component_id).exists()
+    if not component:
+        return None
     crit_norm = CriticalNorm(component_id=component_id, amount=amount)
     session.add(crit_norm)
     session.commit()

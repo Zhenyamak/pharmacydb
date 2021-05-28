@@ -7,6 +7,7 @@ from app.model import Medicine
 from app.lib.enums import OrderStatus
 from app.services import supply_request as sr_service
 from app.services.db import session
+from app.services.component import set_component_amount
 
 
 def create_order(
@@ -30,7 +31,8 @@ def create_order(
         if ingredient.dose > component.amount:
             sr_service.create_supply_request(component.id, recipe.client_id)
             order.status = OrderStatus.waiting_for_components
-
+        else:
+            set_component_amount(component.id, (component.amount-ingredient.dose))
     recipe.order_id = order.id
     recipe.ready_time = ready_time
     session.add_all([recipe, order])

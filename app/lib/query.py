@@ -1,12 +1,14 @@
+from app.services import medicine
 import typing as t
 from itertools import groupby
 from operator import itemgetter
 from datetime import date
 
 from sqlalchemy import distinct, func, text
+from sqlalchemy.sql.expression import select
 
 from app.lib.enums import MedicineType
-from app.model import Client, Component, CookingBook, Ingredient, Medicine, Order, Recipe
+from app.model import Client, Component, CookingBook, CriticalNorm, Ingredient, Medicine, Order, Recipe
 from app.services.db import session
 
 
@@ -91,6 +93,16 @@ def get_client_by_ordered_medicine_type(
     return [r[2] for r in query.all()]
 
 
+# 6
+def get_components_with_critical_norm():
+    query = (
+        session.query(CriticalNorm.amount, Component)
+        .join(Component)
+        .filter(Component.amount <= CriticalNorm.amount)
+    )
+    return [r[1] for r in query.all()]
+
+
 # 7
 def get_medicine_with_minimal_components_amount(
     type: t.Optional[MedicineType] = None
@@ -122,6 +134,17 @@ def get_orders_amount_in_process_status():
     )
 
     return query.scalar()
+
+
+# 9
+def get_medicine_in_waiting_for_components_status():
+    query = (
+        session.query(Order.status, Medicine)
+        .join(Medicine)
+        .filter(Order.status == Order.STATUSES.waiting_for_components)
+    )
+
+    return [r[1] for r in query.all()]
 
 
 # 10
@@ -197,6 +220,28 @@ def get_component_price_for_medicine(
             key=itemgetter(0),
         )
     }
+
+
+# 12
+def get_orders_for_most_popular_medicine():
+    most_popular_medicine_id = (
+        session.query(
+            Order.medicine_id,
+            func.count(Order.medicine_id).label('order_amount')
+        )
+        .group_by(Order.medicine_id)
+        .order_by(text('order_amount DESC'))
+        .limit(1)
+        .first()
+    )
+    if most_popular_medicine_id:
+        query = (
+            session.query(Order)
+            .filter(Order.medicine_id == most_popular_medicine_id[0])
+        )
+        return query.all()
+    else:
+        return None
 
 
 # 13

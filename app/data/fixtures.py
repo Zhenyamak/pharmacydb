@@ -16,11 +16,11 @@ from app.lib.enums import ConsumptionType
 from app.model import Order
 
 
-water = component_service.crete_component('water', 100.0, 1000.0)
-herbs = component_service.crete_component('herbs', 105.0, 1500.0)
-solt = component_service.crete_component('solt', 50.0, 1000.0)
-sugar = component_service.crete_component('sugar', 76.5, 1800.0)
-alcohol = component_service.crete_component('alcohol', 300.0, 1300.0)
+water = component_service.create_component('water', 100.0, 1000.0)
+herbs = component_service.create_component('herbs', 105.0, 1500.0)
+solt = component_service.create_component('solt', 50.0, 1000.0)
+sugar = component_service.create_component('sugar', 76.5, 1800.0)
+alcohol = component_service.create_component('alcohol', 300.0, 1300.0)
 
 ing_water = ingredient_service.add_ingredient(water.id, 100.0)
 ing_herbs = ingredient_service.add_ingredient(herbs.id, 150.0)
@@ -118,11 +118,26 @@ r3 = recipe_service.create_recipe(
     'doctor mom'
 )
 
+r4 = recipe_service.create_recipe(
+    'Doctor I Bolit',
+    cl1.id,
+    'flu',
+    250.0,
+    ConsumptionType.external,
+    'doctor mom'
+)
+
+
 
 order_service.create_order(r1, m1, date.today() + timedelta(days=1))
 order_service.create_order(r1, m1, date.today() + timedelta(days=2))
 or1 = order_service.create_order(r2, m2, date.today() - timedelta(days=2))
 or1.status = Order.STATUSES.ready
 or2 = order_service.create_order(r3, m3, date.today() + timedelta(days=7))
-session.add_all([or1, or2])
+or3 = order_service.create_order(r4, m3, date.today() + timedelta(days=3))
+or3.status = Order.STATUSES.waiting_for_components
+session.add_all([or1, or2, or3])
 session.commit()
+
+oil = component_service.create_component('oil', 100.0, 90.0)
+cn_service.create_critical_norm(oil.id, 100.0)

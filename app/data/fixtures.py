@@ -67,7 +67,7 @@ m1 = medicine_service.create_medicine(
     50.0,
     MedicineType.liquor,
     CookingMethod.creaming,
-    [ing_water, ing_herbs]
+    [ing_water.id, ing_herbs.id]
 )
 
 m2 = medicine_service.create_medicine(
@@ -77,7 +77,7 @@ m2 = medicine_service.create_medicine(
     10000.0,
     MedicineType.pill,
     CookingMethod.mixing,
-    [ing_sugar, ing_herbs, ing_alcohol]
+    [ing_sugar.id, ing_herbs.id, ing_alcohol.id]
 )
 
 m3 = medicine_service.create_medicine(
@@ -87,7 +87,7 @@ m3 = medicine_service.create_medicine(
     40.0,
     MedicineType.ointment,
     CookingMethod.creaming,
-    [ing_solt, ing_water, ing_herbs],
+    [ing_solt.id, ing_water.id, ing_herbs.id],
 )
 
 
@@ -129,12 +129,12 @@ r4 = recipe_service.create_recipe(
 
 
 
-order_service.create_order(r1, m1, date.today() + timedelta(days=1))
-order_service.create_order(r1, m1, date.today() + timedelta(days=2))
-or1 = order_service.create_order(r2, m2, date.today() - timedelta(days=2))
+order_service.create_order(r1.id, m1.id, date.today() + timedelta(days=1))
+order_service.create_order(r1.id, m1.id, date.today() + timedelta(days=2))
+or1 = order_service.create_order(r2.id, m2.id, date.today() - timedelta(days=2))
 or1.status = Order.STATUSES.ready
-or2 = order_service.create_order(r3, m3, date.today() + timedelta(days=7))
-or3 = order_service.create_order(r4, m3, date.today() + timedelta(days=3))
+or2 = order_service.create_order(r3.id, m3.id, date.today() + timedelta(days=7))
+or3 = order_service.create_order(r4.id, m3.id, date.today() + timedelta(days=3))
 or3.status = Order.STATUSES.waiting_for_components
 session.add_all([or1, or2, or3])
 session.commit()

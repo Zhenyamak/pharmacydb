@@ -8,6 +8,7 @@ from app.services.db import session
 from app.lib.enums import MedicineType
 from app.lib.enums import CookingMethod
 from app.services import cooking_book as cb_service
+from app.model import Ingredient
 
 
 def create_medicine(
@@ -17,7 +18,7 @@ def create_medicine(
     price: float,
     type: MedicineType,
     cooking_method: CookingMethod,
-    ingredients: t.List[Component] = [],
+    ingredients_ids: t.List[int] = [],
 ) -> Medicine:
     med = Medicine(
         name=name,
@@ -25,6 +26,10 @@ def create_medicine(
         amount=amount,
         price=price,
         type=type,
+    )
+    ingredients = (
+        session.query(Ingredient)
+        .filter(Ingredient.id.in_(ingredients_ids))
     )
     if ingredients:
         med.ingredients.extend(ingredients)

@@ -11,7 +11,7 @@ def create_component(name: str, price: float, amount: float) -> Component:
     return com
 
 
-def get_ingredient_by_id(id_: int) -> Optional[Component]:
+def get_component_by_id(id_: int) -> Optional[Component]:
     component = session.query(Component).get(id_)
     return component
 

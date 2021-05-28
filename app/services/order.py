@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import date
 
 from app.model import Order
@@ -9,10 +10,15 @@ from app.services.db import session
 
 
 def create_order(
-    recipe: Recipe,
-    medicine: Medicine,
+    recipe_id: int,
+    medicine_id: int,
     ready_time: date,
-) -> Order:
+) -> Optional[Order]:
+    recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
+    medicine = session.query(Medicine).filter(
+        Medicine.id == medicine_id).first()
+    if not (recipe and medicine):
+        return None
     order = Order(
         client_id=recipe.client_id,
         medicine_id=medicine.id,

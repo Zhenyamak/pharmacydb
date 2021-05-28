@@ -3,8 +3,8 @@ from app.menu.handlers import COMMANDS
 
 
 def menu():
-    print('Enter command, help - see all avaliable commands')
     while True:
+        print('Enter command, help - see all avaliable commands')
         command = input('=> ')
         handler = COMMANDS.get(command)
         if handler:

@@ -392,7 +392,7 @@ COMMANDS = {
     'create component': create_component_handler,
     'create ingredient': create_ingredient_handler,
     'create medicine': create_medicine_handler,  # ?
-    'create_recipe_and_order': create_recipe_and_order_handler,
+    'create_recipe_and_order': create_recipe_and_order_handler,  # ?
     '------------ set commands ------------': 2,
     'set component amount': set_component_amount_handler,
     'set ingredient dose': set_ingredient_dose_handler,

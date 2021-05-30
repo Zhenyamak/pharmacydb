@@ -412,7 +412,7 @@ COMMANDS = {
     'get clients waiting for ingredients': get_clients_waiting_for_ingredients_handler,  # 2
     'get top ten most used medicines': get_top_ten_most_used_medicines_handler,  # 3
     'get_component_used_amount': get_component_used_amount_handler,  # 4
-    'get_client_by_ordered_medicine_type': get_client_by_ordered_medicine_type_handler,  # 5
+    'get_client_by_ordered_medicine_type': get_client_by_ordered_medicine_type_handler,  # 5 ?
     'get components with critical norm': get_components_with_critical_norm_handler,  # 6
     'get medicine with minimal components amount': get_medicine_with_minimal_components_amount_handler,  # 7 ?
     'get orders amount in process status': get_orders_amount_in_process_status_handler,  # 8

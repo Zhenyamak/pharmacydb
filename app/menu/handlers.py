@@ -1,4 +1,5 @@
 from sys import exit
+from datetime import datetime
 from app.model import *
 
 from app.services.db import session
@@ -11,8 +12,10 @@ from app.services import medicine as medicine_service
 from app.services import order as order_service
 from app.services import recipe as recipe_service
 from app.lib import query as q
+from app.lib import enums
 
 
+# create
 def create_component_handler():
     name = input('Enter name')
     try:
@@ -88,34 +91,71 @@ def create_medicine_handler():
     except (ValueError, TypeError):
         print('Wrong price')
         return
-    type = input('Enter type')
+    type_ = input('Enter type')
     medicine = medicine_service.create_medicine(
         name=name,
         storage_time=storage_time,
         amount=amount,
         price=price,
-        type=type,
+        type=type_,
     )
     print(medicine)
 
 
-def create_recipe_handler():
+def create_recipe_and_order_handler():
+    print("Creating recipe")
     doctor = input('Enter doctor')
-    client_id = input('Enter client id')
-
     try:
-        ready_time = input('Enter ready time')
+        client_id = int(input('Enter client id'))
     except (ValueError, TypeError):
-        print('Wrong ready time')
+        print('Wrong client id')
+        return
+    diagnosis = input('Enter diagnosis')
+    try:
+        amount = int(input('Enter amount'))
+    except (ValueError, TypeError):
+        print('Wrong amount')
+        return
+    consumption_type_str = input('Enter consumption type')
+    consumption_type = ConsumptionType[consumption_type_str]
+    medicine_name = input('Enter medicine name')
+    try:
+        order_id = int(input('Enter order id'))
+    except (ValueError, TypeError):
+        print('Wrong order id')
+        return
+    rt = input('Enter ready time')
+    ready_time = datetime.strptime(rt, '%d')
+    recipe = recipe_service.create_recipe(
+        doctor=doctor,
+        client_id=client_id,
+        diagnosis=diagnosis,
+        amount=amount,
+        consumption_type=consumption_type,
+        ready_time=ready_time,
+        order_id=order_id,
+        medicine_name=medicine_name,
+    )
+    print(recipe)
+    print("Creating order")
+    try:
+        recipe_id = int(input('Enter recipe id'))
+    except (ValueError, TypeError):
+        print('Wrong recipe id')
+        return
+    try:
+        medicine_id = int(input('Enter medicine id'))
+    except (ValueError, TypeError):
+        print('Wrong medicine id')
         return
     order = order_service.create_order(
-        client_id=recipe.client_id,
-        medicine_id=medicine.id,
-        status=OrderStatus.in_process
+        client_id=client_id,
+        medicine_id=medicine_id,
     )
     print(order)
 
 
+# set
 def set_component_amount_handler():
     try:
         component_id = int(input('Enter id'))
@@ -158,6 +198,7 @@ def set_ingredient_dose_handler():
     ingredient_service.set_ingredient_dose(id_, dose)
 
 
+# get
 def get_ingredient_by_id_handler():
     try:
         id_ = int(input('Enter id'))
@@ -217,6 +258,7 @@ def get_all_orders():
         print(item)
 
 
+# meh
 def shut_down():
     print("Bye")
     exit()
@@ -229,6 +271,7 @@ def help_handler():
     print("""""")
 
 
+# queries
 # 1
 def get_clients_with_not_taken_orders_handler():
     res = q.get_clients_with_not_taken_orders()
@@ -250,6 +293,23 @@ def get_top_ten_most_used_medicines_handler():
         print(item)
 
 
+# 4
+def get_component_used_amount_handler():
+    name = input('Enter name')
+    sd = input('Enter start date')
+    start_date = datetime.strptime(sd, '%d/%m/%y')
+    ed = input('Enter end date')
+    end_date = datetime.strptime(ed, '%d/%m/%y')
+    print(q.get_component_used_amount(name, start_date, end_date))
+
+
+# 5
+def get_client_by_ordered_medicine_type_handler():
+    type_str = input('Enter type')
+    type_ = MedicineType[type_str]
+    print(q.get_client_by_ordered_medicine_type(type_))
+
+
 # 6
 def get_components_with_critical_norm_handler():
     res = q.get_components_with_critical_norm()
@@ -259,7 +319,8 @@ def get_components_with_critical_norm_handler():
 
 # 7
 def get_medicine_with_minimal_components_amount_handler():
-    type_ = input('Enter type')
+    type_str = input('Enter type')
+    type_ = MedicineType[type_str]
     print(q.get_medicine_with_minimal_components_amount(type_))
 
 
@@ -284,7 +345,8 @@ def get_cooking_book_for_medicine_name_handler():
 
 
 def get_cooking_book_for_medicine_type_handler():
-    type_ = input('Enter type')
+    type_str = input('Enter type')
+    type_ = MedicineType[type_str]
     print(q.get_cooking_book_for_medicine_type(type_))
 
 
@@ -329,14 +391,15 @@ COMMANDS = {
     'create client': create_client_handler,
     'create component': create_component_handler,
     'create ingredient': create_ingredient_handler,
-    'create medicine': create_medicine_handler,
+    'create medicine': create_medicine_handler,  # ?
+    'create_recipe_and_order': create_recipe_and_order_handler,
     '------------ set commands ------------': 2,
     'set component amount': set_component_amount_handler,
     'set ingredient dose': set_ingredient_dose_handler,
     'set critical norm': set_critical_norm_handler,
     '------------ get commands ------------': 3,
-    'get ingredient by id': get_ingredient_by_id_handler,
-    'get ingredient by id 2': get_ingredient_by_id_handler_2,
+    'get component by id': get_ingredient_by_id_handler,
+    'get ingredient by id': get_ingredient_by_id_handler_2,
     'get by name medicine': get_by_name_handler,
     'get all components': get_all_components,
     'get all clients': get_all_clients,
@@ -348,6 +411,8 @@ COMMANDS = {
     'get clients with not taken orders': get_clients_with_not_taken_orders_handler,  # 1
     'get clients waiting for ingredients': get_clients_waiting_for_ingredients_handler,  # 2
     'get top ten most used medicines': get_top_ten_most_used_medicines_handler,  # 3
+    'get_component_used_amount': get_component_used_amount_handler,  # 4
+    'get_client_by_ordered_medicine_type': get_client_by_ordered_medicine_type_handler,  # 5
     'get components with critical norm': get_components_with_critical_norm_handler,  # 6
     'get medicine with minimal components amount': get_medicine_with_minimal_components_amount_handler,  # 7 ?
     'get orders amount in process status': get_orders_amount_in_process_status_handler,  # 8

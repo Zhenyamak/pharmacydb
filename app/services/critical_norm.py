@@ -7,7 +7,7 @@ def create_critical_norm(
     component_id: int,
     amount: float,
 ) -> CriticalNorm:
-    component = session.query(Component).filter(Component.id == component_id).exists()
+    component = session.query(Component).filter(Component.id == component_id).first()
     if not component:
         return None
     crit_norm = CriticalNorm(component_id=component_id, amount=amount)

@@ -6,7 +6,7 @@ def create_supply_request(
     component_id: int,
     client_id: int,
 ) -> SupplyRequest:
-    component = session.query(Component).filter(Component.id == component_id).exists()
+    component = session.query(Component).filter(Component.id == component_id).first()
     if not component:
         return None
     sup_request = SupplyRequest(

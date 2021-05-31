@@ -75,25 +75,28 @@ def create_ingredient_handler():
 
 def create_medicine_handler():
     name = input('Enter name:')
+    storage_time_str = input('Enter storage time (Y-m-d format):')
     try:
-        storage_time = input('Enter storage time:')
-    except (ValueError, TypeError):
+        storage_time = (
+            datetime.datetime.strptime(storage_time_str, "%Y-%m-%d").date()
+        )
+    except ValueError:
         print('Wrong storage time')
         return
     try:
-        amount = input('Enter amount:')
+        amount = float(input('Enter amount:'))
     except (ValueError, TypeError):
         print('Wrong amount')
         return
     try:
-        price = input('Enter price:')
+        price = float(input('Enter price:'))
     except (ValueError, TypeError):
         print('Wrong price')
         return
+    type_str = input('Enter type:')
     try:
-        type_str = input('Enter type:')
         type_ = MedicineType[type_str]
-    except (KeyError, TypeError):
+    except KeyError:
         print('No such type')
         return
     medicine = medicine_service.create_medicine(
@@ -120,22 +123,23 @@ def create_recipe_and_order_handler():
     except (ValueError, TypeError):
         print('Wrong amount')
         return
+    consumption_type_str = input('Enter consumption type:')
     try:
-        consumption_type_str = input('Enter consumption type:')
         consumption_type = ConsumptionType[consumption_type_str]
-    except (KeyError, TypeError):
+    except KeyError:
         print('No such type')
         return
     medicine_name = input('Enter medicine name:')
-    try:
-        order_id = int(input('Enter order id'))
-    except (ValueError, TypeError):
-        print('Wrong order id')
+    medicine = medicine_service.get_by_name(medicine_name)
+    if not medicine:
+        print('Not such medicine')
         return
     try:
         rt = input('Enter ready time:')
-        ready_time = datetime.datetime.strptime(rt, '%d')
-    except (ValueError, TypeError):
+        ready_time = (
+            datetime.datetime.strptime(rt, "%Y-%m-%d").date()
+        )
+    except ValueError:
         print('No such date')
         return
     recipe = recipe_service.create_recipe(
@@ -145,24 +149,14 @@ def create_recipe_and_order_handler():
         amount=amount,
         consumption_type=consumption_type,
         ready_time=ready_time,
-        order_id=order_id,
         medicine_name=medicine_name,
     )
     print(recipe)
     print("Creating order")
-    try:
-        recipe_id = int(input('Enter recipe id:'))
-    except (ValueError, TypeError):
-        print('Wrong recipe id')
-        return
-    try:
-        medicine_id = int(input('Enter medicine id:'))
-    except (ValueError, TypeError):
-        print('Wrong medicine id')
-        return
     order = order_service.create_order(
-        client_id=client_id,
-        medicine_id=medicine_id,
+        medicine_id=medicine.id,
+        recipe_id=recipe.id,
+        ready_time=ready_time,
     )
     print(order)
 

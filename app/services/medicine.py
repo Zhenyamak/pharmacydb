@@ -40,4 +40,4 @@ def create_medicine(
 
 
 def get_by_name(name: str) -> t.Optional[Medicine]:
-    return session.query(Medicine).filter(name == name).fisrt()
+    return session.query(Medicine).filter(name == name).first()

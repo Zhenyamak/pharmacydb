@@ -17,7 +17,7 @@ def create_recipe(
     order_id: Optional[int] = None,
     ready_time: Optional[date] = None,
 ) -> Recipe:
-    client = session.query(Client).filter(Client.id == client_id).exists()
+    client = session.query(Client).filter(Client.id == client_id).first()
     if not client:
         return None
     recipe = Recipe(

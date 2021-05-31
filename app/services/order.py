@@ -33,9 +33,11 @@ def create_order(
             order.status = OrderStatus.waiting_for_components
         else:
             set_component_amount(component.id, (component.amount-ingredient.dose))
+    session.add(order)
+    session.commit()
     recipe.order_id = order.id
     recipe.ready_time = ready_time
-    session.add_all([recipe, order])
+    session.add(recipe)
     session.commit()
 
     return order

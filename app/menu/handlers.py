@@ -12,7 +12,6 @@ from app.services import medicine as medicine_service
 from app.services import order as order_service
 from app.services import recipe as recipe_service
 from app.lib import query as q
-from app.lib import enums
 
 
 # create
@@ -91,7 +90,12 @@ def create_medicine_handler():
     except (ValueError, TypeError):
         print('Wrong price')
         return
-    type_ = input('Enter type:')
+    try:
+        type_str = input('Enter type:')
+        type_ = MedicineType[type_str]
+    except (KeyError, TypeError):
+        print('No such type')
+        return
     medicine = medicine_service.create_medicine(
         name=name,
         storage_time=storage_time,
@@ -116,16 +120,24 @@ def create_recipe_and_order_handler():
     except (ValueError, TypeError):
         print('Wrong amount')
         return
-    consumption_type_str = input('Enter consumption type:')
-    consumption_type = ConsumptionType[consumption_type_str]
+    try:
+        consumption_type_str = input('Enter consumption type:')
+        consumption_type = ConsumptionType[consumption_type_str]
+    except (KeyError, TypeError):
+        print('No such type')
+        return
     medicine_name = input('Enter medicine name:')
     try:
         order_id = int(input('Enter order id'))
     except (ValueError, TypeError):
         print('Wrong order id')
         return
-    rt = input('Enter ready time:')
-    ready_time = datetime.datetime.strptime(rt, '%d')
+    try:
+        rt = input('Enter ready time:')
+        ready_time = datetime.datetime.strptime(rt, '%d')
+    except (ValueError, TypeError):
+        print('No such date')
+        return
     recipe = recipe_service.create_recipe(
         doctor=doctor,
         client_id=client_id,
@@ -296,17 +308,29 @@ def get_top_ten_most_used_medicines_handler():
 # 4
 def get_component_used_amount_handler():
     name = input('Enter name:')
-    sd = input('Enter start date:')
-    start_date = datetime.datetime.strptime(sd, '%d-%m-%y')
-    ed = input('Enter end date:')
-    end_date = datetime.datetime.strptime(ed, '%d-%m-%y')
+    try:
+        sd = input('Enter start date:')
+        start_date = datetime.datetime.strptime(sd, '%d-%m-%y')
+    except (ValueError, TypeError):
+        print('No such date')
+        return
+    try:
+        ed = input('Enter end date:')
+        end_date = datetime.datetime.strptime(ed, '%d-%m-%y')
+    except (ValueError, TypeError):
+        print('No such date')
+        return
     print(q.get_component_used_amount(name, start_date, end_date))
 
 
 # 5
 def get_client_by_ordered_medicine_type_handler():
-    type_str = input('Enter type:')
-    type_ = MedicineType[type_str]
+    try:
+        type_str = input('Enter type:')
+        type_ = MedicineType[type_str]
+    except (KeyError, TypeError):
+        print('No such type')
+        return
     print(q.get_client_by_ordered_medicine_type(type_))
 
 
@@ -319,8 +343,12 @@ def get_components_with_critical_norm_handler():
 
 # 7
 def get_medicine_with_minimal_components_amount_handler():
-    type_str = input('Enter type:')
-    type_ = MedicineType[type_str]
+    try:
+        type_str = input('Enter type:')
+        type_ = MedicineType[type_str]
+    except (KeyError, TypeError):
+        print('No such type')
+        return
     print(q.get_medicine_with_minimal_components_amount(type_))
 
 
@@ -345,9 +373,17 @@ def get_cooking_book_for_medicine_name_handler():
 
 
 def get_cooking_book_for_medicine_type_handler():
-    type_str = input('Enter type:')
-    type_ = MedicineType[type_str]
+    try:
+        type_str = input('Enter type:')
+        type_ = MedicineType[type_str]
+    except (KeyError, TypeError):
+        print('No such type')
+        return
     print(q.get_cooking_book_for_medicine_type(type_))
+
+
+def get_cooking_book_for_orders_in_process_handler():
+    print(q.get_cooking_book_for_orders_in_process())
 
 
 # 11
@@ -411,14 +447,15 @@ COMMANDS = {
     'get clients with not taken orders': get_clients_with_not_taken_orders_handler,  # 1
     'get clients waiting for ingredients': get_clients_waiting_for_ingredients_handler,  # 2
     'get top ten most used medicines': get_top_ten_most_used_medicines_handler,  # 3
-    'get_component_used_amount': get_component_used_amount_handler,  # 4
-    'get_client_by_ordered_medicine_type': get_client_by_ordered_medicine_type_handler,  # 5
+    'get component used amount': get_component_used_amount_handler,  # 4
+    'get client by ordered medicine type': get_client_by_ordered_medicine_type_handler,  # 5
     'get components with critical norm': get_components_with_critical_norm_handler,  # 6
     'get medicine with minimal components amount': get_medicine_with_minimal_components_amount_handler,  # 7 ?
     'get orders amount in process status': get_orders_amount_in_process_status_handler,  # 8
     'get medicine in waiting for components status': get_medicine_in_waiting_for_components_status_handler,  # 9
     'get cooking book for medicine name': get_cooking_book_for_medicine_name_handler,  # 10 ?
     'get cooking book for medicine type': get_cooking_book_for_medicine_type_handler,
+    'get cooking book for orders in process': get_cooking_book_for_orders_in_process_handler,
     'get price for medicine': get_price_for_medicine_handler,  # 11
     'get component price for medicine': get_component_price_for_medicine_handler,
     'get orders for most popular medicine': get_orders_for_most_popular_medicine_handler,  # 12 ?

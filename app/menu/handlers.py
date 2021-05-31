@@ -99,12 +99,21 @@ def create_medicine_handler():
     except KeyError:
         print('No such type')
         return
+    method_str = input('Enter method:')
+    try:
+        method = CookingMethod[method_str]
+    except KeyError:
+        print('No such method')
+        return
+    ingr_ids=[int(ingr_ids) for ingr_ids in input('Enter ingredient ids:').split()]
     medicine = medicine_service.create_medicine(
         name=name,
         storage_time=storage_time,
         amount=amount,
         price=price,
         type=type_,
+        cooking_method=method,
+        ingredients_ids=ingr_ids
     )
     print(medicine)
 
@@ -202,6 +211,37 @@ def set_ingredient_dose_handler():
         print('Error')
         return
     ingredient_service.set_ingredient_dose(id_, dose)
+
+
+def set_order_id_handler():
+    try:
+        recipe_id = int(input('Enter id:'))
+    except (ValueError, TypeError):
+        print('Error')
+        return
+    try:
+        order_id = int(input('Enter id:'))
+    except (ValueError, TypeError):
+        print('Error')
+        return
+    recipe_service.set_order_id(recipe_id, order_id)
+
+
+def set_ready_time_handler():
+    try:
+        recipe_id = int(input('Enter id:'))
+    except (ValueError, TypeError):
+        print('Error')
+        return
+    try:
+        rt = input('Enter ready time:')
+        ready_time = (
+            datetime.datetime.strptime(rt, "%Y-%m-%d").date()
+        )
+    except ValueError:
+        print('No such date')
+        return
+    recipe_service.set_ready_time(recipe_id, ready_time)
 
 
 # get
@@ -422,11 +462,13 @@ COMMANDS = {
     'create component': create_component_handler,
     'create ingredient': create_ingredient_handler,
     'create medicine': create_medicine_handler,  # ?
-    'create_recipe_and_order': create_recipe_and_order_handler,
+    'create recipe and order': create_recipe_and_order_handler,  # ?
     '------------ set commands ------------': 2,
     'set component amount': set_component_amount_handler,
     'set ingredient dose': set_ingredient_dose_handler,
     'set critical norm': set_critical_norm_handler,
+    'set order id': set_order_id_handler,
+    'set ready time': set_ready_time_handler,
     '------------ get commands ------------': 3,
     'get component by id': get_ingredient_by_id_handler,
     'get ingredient by id': get_ingredient_by_id_handler_2,

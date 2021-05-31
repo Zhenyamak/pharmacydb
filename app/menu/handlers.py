@@ -17,14 +17,14 @@ from app.lib import enums
 
 # create
 def create_component_handler():
-    name = input('Enter name')
+    name = input('Enter name:')
     try:
-        price = float(input('Enter price'))
+        price = float(input('Enter price:'))
     except (ValueError, TypeError):
         print('Wrong price')
         return
     try:
-        amount = float(input('Enter amount'))
+        amount = float(input('Enter amount:'))
     except (ValueError, TypeError):
         print('Wrong amount')
         return
@@ -37,12 +37,12 @@ def create_component_handler():
 
 
 def create_client_handler():
-    first_name = input('Enter first name')
-    last_name = input('Enter last name')
-    phone = input('Enter phone')
-    address = input('Enter address')
+    first_name = input('Enter first name:')
+    last_name = input('Enter last name:')
+    phone = input('Enter phone:')
+    address = input('Enter address:')
     try:
-        age = int(input('Enter age'))
+        age = int(input('Enter age:'))
     except (ValueError, TypeError):
         print('Wrong age')
         return
@@ -58,12 +58,12 @@ def create_client_handler():
 
 def create_ingredient_handler():
     try:
-        component_id = int(input('Enter component id'))
+        component_id = int(input('Enter component id:'))
     except (ValueError, TypeError):
         print('Wrong component id')
         return
     try:
-        dose = int(input('Enter amount'))
+        dose = int(input('Enter amount:'))
     except (ValueError, TypeError):
         print('Wrong amount')
         return
@@ -75,23 +75,23 @@ def create_ingredient_handler():
 
 
 def create_medicine_handler():
-    name = input('Enter name')
+    name = input('Enter name:')
     try:
-        storage_time = input('Enter storage time')
+        storage_time = input('Enter storage time:')
     except (ValueError, TypeError):
         print('Wrong storage time')
         return
     try:
-        amount = input('Enter amount')
+        amount = input('Enter amount:')
     except (ValueError, TypeError):
         print('Wrong amount')
         return
     try:
-        price = input('Enter price')
+        price = input('Enter price:')
     except (ValueError, TypeError):
         print('Wrong price')
         return
-    type_ = input('Enter type')
+    type_ = input('Enter type:')
     medicine = medicine_service.create_medicine(
         name=name,
         storage_time=storage_time,
@@ -103,29 +103,29 @@ def create_medicine_handler():
 
 
 def create_recipe_and_order_handler():
-    print("Creating recipe")
-    doctor = input('Enter doctor')
+    print("Creating recipe:")
+    doctor = input('Enter doctor:')
     try:
-        client_id = int(input('Enter client id'))
+        client_id = int(input('Enter client id:'))
     except (ValueError, TypeError):
         print('Wrong client id')
         return
-    diagnosis = input('Enter diagnosis')
+    diagnosis = input('Enter diagnosis:')
     try:
-        amount = int(input('Enter amount'))
+        amount = int(input('Enter amount:'))
     except (ValueError, TypeError):
         print('Wrong amount')
         return
-    consumption_type_str = input('Enter consumption type')
+    consumption_type_str = input('Enter consumption type:')
     consumption_type = ConsumptionType[consumption_type_str]
-    medicine_name = input('Enter medicine name')
+    medicine_name = input('Enter medicine name:')
     try:
         order_id = int(input('Enter order id'))
     except (ValueError, TypeError):
         print('Wrong order id')
         return
-    rt = input('Enter ready time')
-    ready_time = datetime.strptime(rt, '%d')
+    rt = input('Enter ready time:')
+    ready_time = datetime.datetime.strptime(rt, '%d')
     recipe = recipe_service.create_recipe(
         doctor=doctor,
         client_id=client_id,
@@ -139,12 +139,12 @@ def create_recipe_and_order_handler():
     print(recipe)
     print("Creating order")
     try:
-        recipe_id = int(input('Enter recipe id'))
+        recipe_id = int(input('Enter recipe id:'))
     except (ValueError, TypeError):
         print('Wrong recipe id')
         return
     try:
-        medicine_id = int(input('Enter medicine id'))
+        medicine_id = int(input('Enter medicine id:'))
     except (ValueError, TypeError):
         print('Wrong medicine id')
         return
@@ -158,12 +158,12 @@ def create_recipe_and_order_handler():
 # set
 def set_component_amount_handler():
     try:
-        component_id = int(input('Enter id'))
+        component_id = int(input('Enter id:'))
     except (ValueError, TypeError):
         print('Error')
         return
     try:
-        amount = int(input('Enter new amount'))
+        amount = int(input('Enter new amount:'))
     except (ValueError, TypeError):
         print('Error')
         return
@@ -172,12 +172,12 @@ def set_component_amount_handler():
 
 def set_critical_norm_handler():
     try:
-        component_id = int(input('Enter id'))
+        component_id = int(input('Enter id:'))
     except (ValueError, TypeError):
         print('Error')
         return
     try:
-        cn = int(input('Enter new critical norm'))
+        cn = int(input('Enter new critical norm:'))
     except (ValueError, TypeError):
         print('Error')
         return
@@ -186,12 +186,12 @@ def set_critical_norm_handler():
 
 def set_ingredient_dose_handler():
     try:
-        id_ = int(input('Enter id'))
+        id_ = int(input('Enter id:'))
     except (ValueError, TypeError):
         print('Error')
         return
     try:
-        dose = int(input('Enter new dose'))
+        dose = int(input('Enter new dose:'))
     except (ValueError, TypeError):
         print('Error')
         return
@@ -201,7 +201,7 @@ def set_ingredient_dose_handler():
 # get
 def get_ingredient_by_id_handler():
     try:
-        id_ = int(input('Enter id'))
+        id_ = int(input('Enter id:'))
     except (ValueError, TypeError):
         print('Error')
         return
@@ -210,7 +210,7 @@ def get_ingredient_by_id_handler():
 
 def get_ingredient_by_id_handler_2():
     try:
-        id_ = int(input('Enter id'))
+        id_ = int(input('Enter id:'))
     except (ValueError, TypeError):
         print('Error')
         return
@@ -218,7 +218,7 @@ def get_ingredient_by_id_handler_2():
 
 
 def get_by_name_handler():
-    name = input('Enter name')
+    name = input('Enter name:')
     print(medicine_service.get_by_name(name))
 
 
@@ -295,17 +295,17 @@ def get_top_ten_most_used_medicines_handler():
 
 # 4
 def get_component_used_amount_handler():
-    name = input('Enter name')
-    sd = input('Enter start date')
-    start_date = datetime.strptime(sd, '%d/%m/%y')
-    ed = input('Enter end date')
-    end_date = datetime.strptime(ed, '%d/%m/%y')
+    name = input('Enter name:')
+    sd = input('Enter start date:')
+    start_date = datetime.datetime.strptime(sd, '%d-%m-%y')
+    ed = input('Enter end date:')
+    end_date = datetime.datetime.strptime(ed, '%d-%m-%y')
     print(q.get_component_used_amount(name, start_date, end_date))
 
 
 # 5
 def get_client_by_ordered_medicine_type_handler():
-    type_str = input('Enter type')
+    type_str = input('Enter type:')
     type_ = MedicineType[type_str]
     print(q.get_client_by_ordered_medicine_type(type_))
 
@@ -319,7 +319,7 @@ def get_components_with_critical_norm_handler():
 
 # 7
 def get_medicine_with_minimal_components_amount_handler():
-    type_str = input('Enter type')
+    type_str = input('Enter type:')
     type_ = MedicineType[type_str]
     print(q.get_medicine_with_minimal_components_amount(type_))
 
@@ -340,12 +340,12 @@ def get_medicine_in_waiting_for_components_status_handler():
 
 # 10
 def get_cooking_book_for_medicine_name_handler():
-    name = input('Enter name')
+    name = input('Enter name:')
     print(q.get_cooking_book_for_medicine_name(name))
 
 
 def get_cooking_book_for_medicine_type_handler():
-    type_str = input('Enter type')
+    type_str = input('Enter type:')
     type_ = MedicineType[type_str]
     print(q.get_cooking_book_for_medicine_type(type_))
 
@@ -353,7 +353,7 @@ def get_cooking_book_for_medicine_type_handler():
 # 11
 def get_price_for_medicine_handler():
     try:
-        id_ = int(input('Enter id'))
+        id_ = int(input('Enter id:'))
     except (ValueError, TypeError):
         print('Error')
         return
@@ -362,7 +362,7 @@ def get_price_for_medicine_handler():
 
 def get_component_price_for_medicine_handler():
     try:
-        id_ = int(input('Enter id'))
+        id_ = int(input('Enter id:'))
     except (ValueError, TypeError):
         print('Error')
         return
@@ -379,7 +379,7 @@ def get_orders_for_most_popular_medicine_handler():
 # 13
 def get_full_medicine_info_handler():
     try:
-        id_ = int(input('Enter id'))
+        id_ = int(input('Enter id:'))
     except (ValueError, TypeError):
         print('Error')
         return
@@ -392,7 +392,7 @@ COMMANDS = {
     'create component': create_component_handler,
     'create ingredient': create_ingredient_handler,
     'create medicine': create_medicine_handler,  # ?
-    'create_recipe_and_order': create_recipe_and_order_handler,  # ?
+    'create_recipe_and_order': create_recipe_and_order_handler,
     '------------ set commands ------------': 2,
     'set component amount': set_component_amount_handler,
     'set ingredient dose': set_ingredient_dose_handler,
@@ -412,7 +412,7 @@ COMMANDS = {
     'get clients waiting for ingredients': get_clients_waiting_for_ingredients_handler,  # 2
     'get top ten most used medicines': get_top_ten_most_used_medicines_handler,  # 3
     'get_component_used_amount': get_component_used_amount_handler,  # 4
-    'get_client_by_ordered_medicine_type': get_client_by_ordered_medicine_type_handler,  # 5 ?
+    'get_client_by_ordered_medicine_type': get_client_by_ordered_medicine_type_handler,  # 5
     'get components with critical norm': get_components_with_critical_norm_handler,  # 6
     'get medicine with minimal components amount': get_medicine_with_minimal_components_amount_handler,  # 7 ?
     'get orders amount in process status': get_orders_amount_in_process_status_handler,  # 8

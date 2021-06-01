@@ -88,7 +88,7 @@ class CookingBook(Base):
     method = sa.Column(sa.Enum(CookingMethod))
 
     def __repr__(self):
-        return f'CookingBook(id={self.id}, medicine_id={self.medicine_id})'
+        return f'CookingBook(id={self.id}, medicine_id={self.medicine_id}, method={self.method})'
 
 
 class CriticalNorm(Base):

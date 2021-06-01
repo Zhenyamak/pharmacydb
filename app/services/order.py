@@ -42,11 +42,17 @@ def create_order(
 
     return order
 
-def check_readiness(order_id: int):
-    recipe = session.query(Recipe).filter(Recipe.order_id == order_id).first()
-    order = session.query(Order).filter(Order.id == order_id).first()
-    dt = date.today()
-    if dt == recipe.ready_time:
-        order.status = OrderStatus.ready
+def check_readiness():
+    session.query(Recipe, Order)\
+        .filter(Order.status == Order.STATUSES.in_process)\
+        .filter(Recipe.ready_time <= date.today())\
+        .update({'status': OrderStatus.ready})
     session.commit()
-    
+
+
+def take_order(order_id: int):
+    session.query(Order)\
+        .filter(Order.id == order_id).first() \
+        .filter(Order.status == Order.STATUSES.ready) \
+        .update({'status': OrderStatus.closed})
+    session.commit()

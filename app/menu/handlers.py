@@ -374,7 +374,17 @@ def get_client_by_ordered_medicine_type_handler():
     except (KeyError, TypeError):
         print('No such type')
         return
-    print(q.get_client_by_ordered_medicine_type(type_))
+    try:
+        sd = input('Enter start date:')
+        start_date = datetime.datetime.strptime(sd, '%d-%m-%y')
+    except ValueError:
+        start_date = None
+    try:
+        ed = input('Enter end date:')
+        end_date = datetime.datetime.strptime(ed, '%d-%m-%y')
+    except ValueError:
+        end_date = None
+    print(q.get_client_by_ordered_medicine_type(type_, start_date, end_date))
 
 
 # 6
@@ -390,8 +400,7 @@ def get_medicine_with_minimal_components_amount_handler():
         type_str = input('Enter type:')
         type_ = MedicineType[type_str]
     except (KeyError, TypeError):
-        print('No such type')
-        return
+        type_ = None
     print(q.get_medicine_with_minimal_components_amount(type_))
 
 
@@ -493,15 +502,15 @@ COMMANDS = {
     'get component used amount': get_component_used_amount_handler,  # 4
     'get client by ordered medicine type': get_client_by_ordered_medicine_type_handler,  # 5
     'get components with critical norm': get_components_with_critical_norm_handler,  # 6
-    'get medicine with minimal components amount': get_medicine_with_minimal_components_amount_handler,  # 7 ?
+    'get medicine with minimal components amount': get_medicine_with_minimal_components_amount_handler,  # 7
     'get orders amount in process status': get_orders_amount_in_process_status_handler,  # 8
     'get medicine in waiting for components status': get_medicine_in_waiting_for_components_status_handler,  # 9
-    'get cooking book for medicine name': get_cooking_book_for_medicine_name_handler,  # 10 ?
+    'get cooking book for medicine name': get_cooking_book_for_medicine_name_handler,  # 10
     'get cooking book for medicine type': get_cooking_book_for_medicine_type_handler,
     'get cooking book for orders in process': get_cooking_book_for_orders_in_process_handler,
     'get price for medicine': get_price_for_medicine_handler,  # 11
     'get component price for medicine': get_component_price_for_medicine_handler,
-    'get orders for most popular medicine': get_orders_for_most_popular_medicine_handler,  # 12 ?
+    'get orders for most popular medicine': get_orders_for_most_popular_medicine_handler,  # 12
     'get full medicine info': get_full_medicine_info_handler,  # 13
     '------------ system commands ------------': 5,
     'check readiness': order_service.check_readiness,

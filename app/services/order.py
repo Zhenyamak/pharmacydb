@@ -1,6 +1,5 @@
 from typing import Optional
 from datetime import date
-import datetime
 
 from app.model import Order
 from app.model import Recipe
@@ -46,7 +45,7 @@ def create_order(
 def check_readiness(order_id: int):
     recipe = session.query(Recipe).filter(Recipe.order_id == order_id).first()
     order = session.query(Order).filter(Order.id == order_id).first()
-    dt = datetime.date.today
+    dt = date.today()
     if dt == recipe.ready_time:
         order.status = OrderStatus.ready
     session.commit()

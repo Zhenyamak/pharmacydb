@@ -1,5 +1,7 @@
 from typing import Optional
 from datetime import date
+import warnings
+from sqlalchemy import exc as sa_exc
 
 from app.model import Order
 from app.model import Recipe
@@ -32,7 +34,7 @@ def create_order(
             sr_service.create_supply_request(component.id, recipe.client_id)
             order.status = OrderStatus.waiting_for_components
         else:
-            set_component_amount(component.id, recipe.amount * (component.amount-ingredient.dose))
+            set_component_amount(component.id, (component.amount-recipe.amount * ingredient.dose))
     session.add(order)
     session.commit()
     recipe.order_id = order.id
@@ -49,6 +51,11 @@ def check_readiness():
         .filter(Recipe.ready_time <= date.today())\
         .update({'status': Order.STATUSES.ready}, synchronize_session='fetch')
     session.commit()
+
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+    check_readiness()
 
 
 def take_order(order_id: int):

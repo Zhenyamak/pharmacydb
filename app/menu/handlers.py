@@ -75,10 +75,10 @@ def create_ingredient_handler():
 
 def create_medicine_handler():
     name = input('Enter name:')
-    storage_time_str = input('Enter storage time (Y-m-d format):')
+    storage_time_str = input('Enter storage time (d-m-y format):')
     try:
         storage_time = (
-            datetime.datetime.strptime(storage_time_str, "%Y-%m-%d").date()
+            datetime.datetime.strptime(storage_time_str, '%d-%m-%y').date()
         )
     except ValueError:
         print('Wrong storage time')
@@ -105,7 +105,7 @@ def create_medicine_handler():
     except KeyError:
         print('No such method')
         return
-    ingr_ids=[int(ingr_ids) for ingr_ids in input('Enter ingredient ids:').split()]
+    ingredient_ids = [int(ingredient_ids) for ingredient_ids in input('Enter ingredient ids:').split()]
     medicine = medicine_service.create_medicine(
         name=name,
         storage_time=storage_time,
@@ -113,7 +113,7 @@ def create_medicine_handler():
         price=price,
         type=type_,
         cooking_method=method,
-        ingredients_ids=ingr_ids
+        ingredients_ids=ingredient_ids
     )
     print(medicine)
 
@@ -146,7 +146,7 @@ def create_recipe_and_order_handler():
     try:
         rt = input('Enter ready time:')
         ready_time = (
-            datetime.datetime.strptime(rt, "%Y-%m-%d").date()
+            datetime.datetime.strptime(rt, '%d-%m-%y').date()
         )
     except ValueError:
         print('No such date')
@@ -236,7 +236,7 @@ def set_ready_time_handler():
     try:
         rt = input('Enter ready time:')
         ready_time = (
-            datetime.datetime.strptime(rt, "%Y-%m-%d").date()
+            datetime.datetime.strptime(rt, '%d-%m-%y').date()
         )
     except ValueError:
         print('No such date')
@@ -317,6 +317,15 @@ def help_handler():
     print("""""")
 
 
+def take_order_handler():
+    try:
+        order_id = int(input('Enter order id:'))
+    except (ValueError, TypeError):
+        print('Wrong order id')
+        return
+    order_service.take_order(order_id)
+
+
 # queries
 # 1
 def get_clients_with_not_taken_orders_handler():
@@ -388,9 +397,7 @@ def get_medicine_with_minimal_components_amount_handler():
 
 # 8
 def get_orders_amount_in_process_status_handler():
-    res = q.get_orders_amount_in_process_status()
-    for item in res:
-        print(item)
+    print(q.get_orders_amount_in_process_status())
 
 
 # 9
@@ -498,7 +505,7 @@ COMMANDS = {
     'get full medicine info': get_full_medicine_info_handler,  # 13
     '------------ system commands ------------': 5,
     'check readiness': order_service.check_readiness,
-    'take order': order_service.take_order,
+    'take order': take_order_handler,
     'exit': shut_down,
     'help': help_handler,
 }

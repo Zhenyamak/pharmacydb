@@ -497,6 +497,8 @@ COMMANDS = {
     'get orders for most popular medicine': get_orders_for_most_popular_medicine_handler,  # 12 ?
     'get full medicine info': get_full_medicine_info_handler,  # 13
     '------------ system commands ------------': 5,
+    'check readiness': order_service.check_readiness,
+    'take order': order_service.take_order,
     'exit': shut_down,
     'help': help_handler,
 }

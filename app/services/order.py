@@ -28,11 +28,11 @@ def create_order(
     for ingredient in medicine.ingredients:
         component = ingredient.component
 
-        if ingredient.dose > component.amount:
+        if recipe.amount * ingredient.dose > component.amount:
             sr_service.create_supply_request(component.id, recipe.client_id)
             order.status = OrderStatus.waiting_for_components
         else:
-            set_component_amount(component.id, (component.amount-ingredient.dose))
+            set_component_amount(component.id, recipe.amount * (component.amount-ingredient.dose))
     session.add(order)
     session.commit()
     recipe.order_id = order.id
@@ -42,17 +42,18 @@ def create_order(
 
     return order
 
+
 def check_readiness():
-    session.query(Recipe, Order)\
+    session.query(Order) \
         .filter(Order.status == Order.STATUSES.in_process)\
         .filter(Recipe.ready_time <= date.today())\
-        .update({'status': OrderStatus.ready})
+        .update({'status': Order.STATUSES.ready}, synchronize_session='fetch')
     session.commit()
 
 
 def take_order(order_id: int):
     session.query(Order)\
-        .filter(Order.id == order_id).first() \
-        .filter(Order.status == Order.STATUSES.ready) \
-        .update({'status': OrderStatus.closed})
+        .filter(Order.id == order_id) \
+        .filter(Order.status == Order.STATUSES.ready)\
+        .update({'status': Order.STATUSES.closed})
     session.commit()

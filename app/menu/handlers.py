@@ -138,21 +138,12 @@ def create_recipe_and_order_handler():
     if not medicine:
         print("No such medicine")
         return
-    try:
-        rt = input('Enter ready time:')
-        ready_time = (
-            datetime.datetime.strptime(rt, '%d-%m-%y').date()
-        )
-    except ValueError:
-        print('No such date')
-        return
     recipe = recipe_service.create_recipe(
         doctor=doctor,
         client_id=client_id,
         diagnosis=diagnosis,
         amount=amount,
         consumption_type=consumption_type,
-        ready_time=ready_time,
         medicine_name=medicine_name,
     )
     print(recipe)
@@ -161,6 +152,14 @@ def create_recipe_and_order_handler():
         medicine_id = int(input('Enter medicine id:'))
     except (ValueError, TypeError):
         print('Wrong medicine id')
+        return
+    try:
+        rt = input('Enter ready time:')
+        ready_time = (
+            datetime.datetime.strptime(rt, '%d-%m-%y').date()
+        )
+    except ValueError:
+        print('No such date')
         return
     order = order_service.create_order(
         medicine_id=medicine_id,
@@ -216,7 +215,7 @@ def set_ingredient_dose_handler():
 
 def set_ready_time_handler():
     try:
-        recipe_id = int(input('Enter id:'))
+        order_id = int(input('Enter id:'))
     except (ValueError, TypeError):
         print('Error')
         return
@@ -228,7 +227,7 @@ def set_ready_time_handler():
     except ValueError:
         print('No such date')
         return
-    recipe_service.set_ready_time(recipe_id, ready_time)
+    order_service.set_ready_time(order_id, ready_time)
 
 
 # get

@@ -25,7 +25,8 @@ def create_order(
     order = Order(
         client_id=recipe.client_id,
         medicine_id=medicine.id,
-        status=OrderStatus.in_process
+        status=OrderStatus.in_process,
+        ready_time = ready_time
     )
     for ingredient in medicine.ingredients:
         component = ingredient.component
@@ -38,11 +39,17 @@ def create_order(
     session.add(order)
     session.commit()
     recipe.order_id = order.id
-    recipe.ready_time = ready_time
     session.add(recipe)
     session.commit()
 
     return order
+
+
+def set_ready_time(id_: int, ready_time: date):
+    session.query(Order).filter(Order.id == id_).update(
+        {'ready_time': ready_time}
+    )
+    session.commit()
 
 
 def take_order(order_id: int):
@@ -56,6 +63,6 @@ def take_order(order_id: int):
 def check_readiness():
     session.query(Order) \
         .filter(Order.status == Order.STATUSES.in_process)\
-        .filter(Recipe.ready_time <= date.today())\
-        .update({'status': Order.STATUSES.ready}, synchronize_session='fetch')
+        .filter(Order.ready_time <= date.today())\
+        .update({'status': Order.STATUSES.ready})
     session.commit()

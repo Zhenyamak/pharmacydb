@@ -83,6 +83,7 @@ def create_orders_table():
     client_id INTEGER, 
     medicine_id INTEGER, 
     date_created DATE NOT NULL, 
+    ready_time DATE,
     PRIMARY KEY (id), 
     FOREIGN KEY(client_id) REFERENCES client (id) ON DELETE CASCADE, 
     FOREIGN KEY(medicine_id) REFERENCES medicine (id) ON DELETE CASCADE
@@ -120,8 +121,7 @@ def create_recipe_table():
     client_id INTEGER, 
     diagnosis VARCHAR(255), 
     amount FLOAT, 
-    consumption_type ENUM('internal','external','mixing'), 
-    ready_time DATE, 
+    consumption_type ENUM('internal','external','mixing'),  
     order_id INTEGER, 
     PRIMARY KEY (id), 
     FOREIGN KEY(client_id) REFERENCES client (id) ON DELETE CASCADE,

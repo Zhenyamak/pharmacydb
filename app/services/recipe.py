@@ -3,6 +3,7 @@ from datetime import date
 
 from app.model import Client
 from app.model import Recipe
+from app.model import Medicine
 from app.services.db import session
 from app.lib.enums import ConsumptionType
 
@@ -15,7 +16,6 @@ def create_recipe(
     consumption_type: ConsumptionType,
     medicine_name: str,
     order_id: Optional[int] = None,
-    ready_time: Optional[date] = None,
 ) -> Recipe:
     client = session.query(Client).filter(Client.id == client_id).first()
     if not client:
@@ -26,7 +26,6 @@ def create_recipe(
         diagnosis=diagnosis,
         amount=amount,
         consumption_type=consumption_type,
-        ready_time=ready_time,
         order_id=order_id,
         medicine_name=medicine_name,
     )
@@ -35,13 +34,7 @@ def create_recipe(
     return recipe
 
 
-def set_order_id(id_: int, order_id: int):
-    session.query(Recipe).filter(Recipe.id == id_).update({'order_id': order_id})
-    session.commit()
-
-
-def set_ready_time(id_: int, ready_time: date):
-    session.query(Recipe).filter(Recipe.id == id_).update(
-        {'ready_time': ready_time}
-    )
+def delete_recipe(order_id: int):
+    session.query(Recipe).filter(Recipe.order_id == order_id) \
+        .delete()
     session.commit()

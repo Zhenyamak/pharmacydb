@@ -11,11 +11,13 @@ from app.services import critical_norm as cn_service
 from app.services import medicine as medicine_service
 from app.services import order as order_service
 from app.services import recipe as recipe_service
+from app.services import tables_work as tw
 from app.lib import query as q
 
 
 # create
-def create_component_handler():
+def create_component_and_ingredient_handler():
+    print("Creating component")
     name = input('Enter name:')
     try:
         price = float(input('Enter price:'))
@@ -33,6 +35,17 @@ def create_component_handler():
         amount=amount
     )
     print(component)
+    print("Creating ingredient")
+    try:
+        dose = int(input('Enter dose:'))
+    except (ValueError, TypeError):
+        print('Wrong amount')
+        return
+    ingredient = ingredient_service.add_ingredient(
+        component_id=component.id,
+        dose=dose
+    )
+    print(ingredient)
 
 
 def create_client_handler():
@@ -53,24 +66,6 @@ def create_client_handler():
         age=age,
     )
     print(client)
-
-
-def create_ingredient_handler():
-    try:
-        component_id = int(input('Enter component id:'))
-    except (ValueError, TypeError):
-        print('Wrong component id')
-        return
-    try:
-        dose = int(input('Enter amount:'))
-    except (ValueError, TypeError):
-        print('Wrong amount')
-        return
-    ingredient = ingredient_service.add_ingredient(
-        component_id=component_id,
-        dose=dose
-    )
-    print(ingredient)
 
 
 def create_medicine_handler():
@@ -99,14 +94,13 @@ def create_medicine_handler():
     except KeyError:
         print('No such type')
         return
-    method_str = input('Enter method:')
+    method_str = input('Enter cooking method:')
     try:
         method = CookingMethod[method_str]
     except KeyError:
         print('No such method')
         return
-    ingredient_ids = [int(ingredient_ids)
-                      for ingredient_ids in input('Enter ingredient ids:').split()]
+    ingredient_ids = [int(ingredient_ids) for ingredient_ids in input('Enter ingredient ids:').split()]
     medicine = medicine_service.create_medicine(
         name=name,
         storage_time=storage_time,
@@ -140,14 +134,14 @@ def create_recipe_and_order_handler():
         print('No such type')
         return
     medicine_name = input('Enter medicine name:')
-    medicine = medicine_service.get_by_name(medicine_name)
+    medicine = session.query(Medicine).filter(Medicine.name == medicine_name).first()
     if not medicine:
-        print('Not such medicine')
+        print("No such medicine")
         return
     try:
-        rt = input('Enter ready time (d-m-y):')
+        rt = input('Enter ready time:')
         ready_time = (
-            datetime.datetime.strptime(rt, '%d-%m-%Y').date()
+            datetime.datetime.strptime(rt, '%d-%m-%y').date()
         )
     except ValueError:
         print('No such date')
@@ -163,11 +157,17 @@ def create_recipe_and_order_handler():
     )
     print(recipe)
     print("Creating order")
+    try:
+        medicine_id = int(input('Enter medicine id:'))
+    except (ValueError, TypeError):
+        print('Wrong medicine id')
+        return
     order = order_service.create_order(
-        medicine_id=medicine.id,
+        medicine_id=medicine_id,
         recipe_id=recipe.id,
         ready_time=ready_time,
     )
+    session.commit()
     print(order)
 
 
@@ -212,20 +212,6 @@ def set_ingredient_dose_handler():
         print('Error')
         return
     ingredient_service.set_ingredient_dose(id_, dose)
-
-
-def set_order_id_handler():
-    try:
-        recipe_id = int(input('Enter id:'))
-    except (ValueError, TypeError):
-        print('Error')
-        return
-    try:
-        order_id = int(input('Enter id:'))
-    except (ValueError, TypeError):
-        print('Error')
-        return
-    recipe_service.set_order_id(recipe_id, order_id)
 
 
 def set_ready_time_handler():
@@ -273,36 +259,49 @@ def get_all_components():
     res = session.query(Component).all()
     for item in res:
         print(item)
+    session.commit()
 
 
 def get_all_clients():
     res = session.query(Client).all()
     for item in res:
         print(item)
+    session.commit()
 
 
 def get_cooking_book():
     res = session.query(CookingBook).all()
     for item in res:
         print(item)
+    session.commit()
 
 
 def get_critical_norm():
     res = session.query(CriticalNorm).all()
     for item in res:
         print(item)
+    session.commit()
 
 
 def get_all_medicines():
     res = session.query(Medicine).all()
     for item in res:
         print(item)
+    session.commit()
 
 
 def get_all_orders():
     res = session.query(Order).all()
     for item in res:
         print(item)
+    session.commit()
+
+
+def get_all_recipes():
+    res = session.query(Recipe).all()
+    for item in res:
+        print(item)
+    session.commit()
 
 
 # meh
@@ -325,6 +324,43 @@ def take_order_handler():
         print('Wrong order id')
         return
     order_service.take_order(order_id)
+
+
+# delete
+def delete_recipe_handler():
+    try:
+        id_ = int(input('Enter recipe id to delete:'))
+    except (ValueError, TypeError):
+        print('Invalid id')
+        return
+    r = session.query(Recipe).get(id_)
+    if r.order_id:
+        session.query(Order).filter(Order.id == r.order_id).delete()
+        session.commit()
+    session.query(Recipe).filter(Recipe.id == id_).delete()
+    session.commit()
+
+
+def delete_medicine_handler():
+    try:
+        medicine_id = int(input('Enter medicine id to delete:'))
+    except (ValueError, TypeError):
+        print('Invalid id')
+        return
+    mn = session.query(Medicine).filter(Medicine.id == medicine_id).first()
+    session.query(Recipe).filter(Recipe.medicine_name == mn.name).delete()
+    session.query(Medicine).filter(Medicine.id == medicine_id).delete()
+    session.commit()
+
+
+def delete_client_handler():
+    try:
+        id_ = int(input('Enter client id to delete:'))
+    except (ValueError, TypeError):
+        print('Invalid id')
+        return
+    session.query(Client).filter(Client.id == id_).delete()
+    session.commit()
 
 
 # queries
@@ -434,7 +470,9 @@ def get_cooking_book_for_medicine_type_handler():
 
 
 def get_cooking_book_for_orders_in_process_handler():
-    print(q.get_cooking_book_for_orders_in_process())
+    res = q.get_cooking_book_for_orders_in_process()
+    for item in res:
+        print(item)
 
 
 # 11
@@ -473,32 +511,16 @@ def get_full_medicine_info_handler():
     print(q.get_full_medicine_info(id_))
 
 
-def delete_recipe():
-    try:
-        id_ = int(input('Enter recipe id to delete'))
-    except (ValueError, TypeError):
-        print('Invalid id')
-        return
-    r = session.query(Recipe).get(id_)
-    if r.order_id:
-        session.query(Order).filter(Order.id == r.order_id).delete()
-        session.commit()
-    session.query(Recipe).filter(Recipe.id == id_).delete()
-    session.commit()
-
-
 COMMANDS = {
     '------------ create commands ------------': 1,
     'create client': create_client_handler,
-    'create component': create_component_handler,
-    'create ingredient': create_ingredient_handler,
-    'create medicine': create_medicine_handler,  # ?
-    'create recipe and order': create_recipe_and_order_handler,  # ?
+    'create component and ingredient': create_component_and_ingredient_handler,
+    'create medicine': create_medicine_handler,  
+    'create recipe and order': create_recipe_and_order_handler,
     '------------ set commands ------------': 2,
     'set component amount': set_component_amount_handler,
     'set ingredient dose': set_ingredient_dose_handler,
     'set critical norm': set_critical_norm_handler,
-    'set order id': set_order_id_handler,
     'set ready time': set_ready_time_handler,
     '------------ get commands ------------': 3,
     'get component by id': get_ingredient_by_id_handler,
@@ -510,6 +532,7 @@ COMMANDS = {
     'get critical norm': get_critical_norm,
     'get all medicines': get_all_medicines,
     'get all orders': get_all_orders,
+    'get all recipes': get_all_recipes,
     '------------ queries ------------': 4,
     'get clients with not taken orders': get_clients_with_not_taken_orders_handler,  # 1
     'get clients waiting for ingredients': get_clients_waiting_for_ingredients_handler,  # 2
@@ -528,10 +551,14 @@ COMMANDS = {
     'get orders for most popular medicine': get_orders_for_most_popular_medicine_handler,  # 12
     'get full medicine info': get_full_medicine_info_handler,  # 13
     '------------ delete commands ------------': 5,
-    'delete recipe': delete_recipe,
+    'delete recipe': delete_recipe_handler,
+    'delete medicine': delete_medicine_handler,
+    'delete client': delete_client_handler,
     '------------ system commands ------------': 6,
     'check readiness': order_service.check_readiness,
     'take order': take_order_handler,
+    'create all tables': tw.create_all_tables,
+    'drop all tables': tw.full_drop,
     'exit': shut_down,
     'help': help_handler,
 }

@@ -1,5 +1,6 @@
 from datetime import date
 from datetime import timedelta
+from datetime import datetime
 
 from app.services.db import session
 
@@ -18,45 +19,47 @@ from app.model import Order
 
 water = component_service.create_component('water', 100.0, 1000.0)
 herbs = component_service.create_component('herbs', 105.0, 1500.0)
-solt = component_service.create_component('solt', 50.0, 1000.0)
+salt = component_service.create_component('salt', 50.0, 1000.0)
 sugar = component_service.create_component('sugar', 76.5, 1800.0)
 alcohol = component_service.create_component('alcohol', 300.0, 1300.0)
+oil = component_service.create_component('oil', 100.0, 90.0)
 
-ing_water = ingredient_service.add_ingredient(water.id, 100.0)
-ing_herbs = ingredient_service.add_ingredient(herbs.id, 150.0)
-ing_solt = ingredient_service.add_ingredient(solt.id, 100.0)
-ing_sugar = ingredient_service.add_ingredient(sugar.id, 180.0)
-ing_alcohol = ingredient_service.add_ingredient(alcohol.id, 130.0)
+ing_water = ingredient_service.add_ingredient(water.id, 100)
+ing_herbs = ingredient_service.add_ingredient(herbs.id, 150)
+ing_salt = ingredient_service.add_ingredient(salt.id, 100)
+ing_sugar = ingredient_service.add_ingredient(sugar.id, 180)
+ing_alcohol = ingredient_service.add_ingredient(alcohol.id, 130)
 
 cn_service.create_critical_norm(water.id, 100)
 cn_service.create_critical_norm(herbs.id, 150)
-cn_service.create_critical_norm(solt.id, 100)
+cn_service.create_critical_norm(salt.id, 100)
 cn_service.create_critical_norm(sugar.id, 180)
 cn_service.create_critical_norm(alcohol.id, 130)
+cn_service.create_critical_norm(oil.id, 100.0)
 
 
 cl1 = client_service.create_client(
-    first_name='first',
-    last_name='first',
+    first_name='Funny',
+    last_name='Valentine',
     phone='+380507777777',
     address='Novikova 11, 202',
-    age=44,
+    age=48,
 )
 
 cl2 = client_service.create_client(
-    first_name='second',
-    last_name='second',
+    first_name='Gyro',
+    last_name='Zeppeli',
     phone='+380506666666',
     address='Novikova 13, 2',
-    age=15,
+    age=24,
 )
 
 cl3 = client_service.create_client(
-    first_name='third',
-    last_name='third',
+    first_name='Hot',
+    last_name='Pants',
     phone='+380505555555',
     address='Kosmonavtov 3, 14',
-    age=21,
+    age=23,
 )
 
 
@@ -87,15 +90,14 @@ m3 = medicine_service.create_medicine(
     40.0,
     MedicineType.ointment,
     CookingMethod.creaming,
-    [ing_solt.id, ing_water.id, ing_herbs.id],
+    [ing_salt.id, ing_water.id, ing_herbs.id],
 )
-
 
 r1 = recipe_service.create_recipe(
     'Doctor I Bolit',
     cl1.id,
     'cancer',
-    300.0,
+    3.0,
     ConsumptionType.external,
     'brilliant green'
 )
@@ -104,7 +106,7 @@ r2 = recipe_service.create_recipe(
     'Doctor I Bolit',
     cl2.id,
     'flu',
-    150.0,
+    15.0,
     ConsumptionType.internal,
     'pills not for kids'
 )
@@ -113,8 +115,8 @@ r3 = recipe_service.create_recipe(
     'Doctor I Bolit',
     cl3.id,
     'flu',
-    200.0,
-    ConsumptionType.internal,
+    2.0,
+    ConsumptionType.external,
     'doctor mom'
 )
 
@@ -122,22 +124,16 @@ r4 = recipe_service.create_recipe(
     'Doctor I Bolit',
     cl1.id,
     'flu',
-    250.0,
+    2.0,
     ConsumptionType.external,
     'doctor mom'
 )
 
 
-
-order_service.create_order(r1.id, m1.id, date.today() + timedelta(days=1))
-order_service.create_order(r1.id, m1.id, date.today() + timedelta(days=2))
-or1 = order_service.create_order(r2.id, m2.id, date.today() - timedelta(days=2))
-or1.status = Order.STATUSES.ready
-or2 = order_service.create_order(r3.id, m3.id, date.today() + timedelta(days=7))
-or3 = order_service.create_order(r4.id, m3.id, date.today() + timedelta(days=3))
-or3.status = Order.STATUSES.waiting_for_components
-session.add_all([or1, or2, or3])
+or1 = order_service.create_order(r1.id, m2.id, datetime.strptime('21-06-21', '%d-%m-%y'))
+or2 = order_service.create_order(r2.id, m2.id, datetime.strptime('31-05-21', '%d-%m-%y'))
+or3 = order_service.create_order(r3.id, m3.id, datetime.strptime('29-05-21', '%d-%m-%y'))
+or4 = order_service.create_order(r4.id, m3.id, datetime.strptime('21-09-21', '%d-%m-%y'))
 session.commit()
 
-oil = component_service.create_component('oil', 100.0, 90.0)
-cn_service.create_critical_norm(oil.id, 100.0)
+

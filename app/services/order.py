@@ -45,22 +45,17 @@ def create_order(
     return order
 
 
-def check_readiness():
-    session.query(Order) \
-        .filter(Order.status == Order.STATUSES.in_process)\
-        .filter(Recipe.ready_time <= date.today())\
-        .update({'status': Order.STATUSES.ready}, synchronize_session='fetch')
-    session.commit()
-
-
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore", category=sa_exc.SAWarning)
-    check_readiness()
-
-
 def take_order(order_id: int):
     session.query(Order)\
         .filter(Order.id == order_id) \
         .filter(Order.status == Order.STATUSES.ready)\
         .update({'status': Order.STATUSES.closed})
+    session.commit()
+
+
+def check_readiness():
+    session.query(Order) \
+        .filter(Order.status == Order.STATUSES.in_process)\
+        .filter(Recipe.ready_time <= date.today())\
+        .update({'status': Order.STATUSES.ready}, synchronize_session='fetch')
     session.commit()

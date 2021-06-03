@@ -71,10 +71,11 @@ class Order(Base):
     medicine = relationship('Medicine')
     date_created = sa.Column(sa.Date, nullable=False,
                              default=datetime.date.today)
+    ready_time = sa.Column(sa.Date)
 
     def __repr__(self) -> str:
         return (
-            f'Order(id={self.id}, status={self.status}, client_id={self.client_id}, medicine_id={self.medicine_id}, date_created={self.date_created})'
+            f'Order(id={self.id}, status={self.status}, client_id={self.client_id}, medicine_id={self.medicine_id}, date_created={self.date_created}, ready_time={self.ready_time})'
         )
 
 
@@ -124,11 +125,10 @@ class Recipe(Base):
     diagnosis = sa.Column(sa.String(255))
     amount = sa.Column(sa.Float)
     consumption_type = sa.Column(sa.Enum(ConsumptionType))
-    ready_time = sa.Column(sa.Date)
     order_id = sa.Column(sa.Integer, sa.ForeignKey('orders.id', ondelete='CASCADE'))
 
     def __repr__(self):
-        return f'Recipe(id={self.id}, medicine_name={self.medicine_name}, doctor={self.doctor}, client_id={self.client_id}, diagnosis={self.diagnosis}, consumption_type={self.consumption_type}, ready_time={self.ready_time}, order_id={self.order_id},)'
+        return f'Recipe(id={self.id}, medicine_name={self.medicine_name}, doctor={self.doctor}, client_id={self.client_id}, diagnosis={self.diagnosis}, consumption_type={self.consumption_type}, order_id={self.order_id},)'
 
 
 class SupplyRequest(Base):

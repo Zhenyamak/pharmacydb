@@ -125,7 +125,7 @@ class Recipe(Base):
     amount = sa.Column(sa.Float)
     consumption_type = sa.Column(sa.Enum(ConsumptionType))
     ready_time = sa.Column(sa.Date)
-    order_id = sa.Column(sa.Integer, sa.ForeignKey('orders.id'))
+    order_id = sa.Column(sa.Integer, sa.ForeignKey('orders.id', ondelete='CASCADE'))
 
     def __repr__(self):
         return f'Recipe(id={self.id}, medicine_name={self.medicine_name}, client_id={self.client_id}, ready_time={self.ready_time})'

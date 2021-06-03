@@ -105,7 +105,8 @@ def create_medicine_handler():
     except KeyError:
         print('No such method')
         return
-    ingredient_ids = [int(ingredient_ids) for ingredient_ids in input('Enter ingredient ids:').split()]
+    ingredient_ids = [int(ingredient_ids)
+                      for ingredient_ids in input('Enter ingredient ids:').split()]
     medicine = medicine_service.create_medicine(
         name=name,
         storage_time=storage_time,
@@ -144,9 +145,9 @@ def create_recipe_and_order_handler():
         print('Not such medicine')
         return
     try:
-        rt = input('Enter ready time:')
+        rt = input('Enter ready time (d-m-y):')
         ready_time = (
-            datetime.datetime.strptime(rt, '%d-%m-%y').date()
+            datetime.datetime.strptime(rt, '%d-%m-%Y').date()
         )
     except ValueError:
         print('No such date')
@@ -472,6 +473,20 @@ def get_full_medicine_info_handler():
     print(q.get_full_medicine_info(id_))
 
 
+def delete_recipe():
+    try:
+        id_ = int(input('Enter recipe id to delete'))
+    except (ValueError, TypeError):
+        print('Invalid id')
+        return
+    r = session.query(Recipe).get(id_)
+    if r.order_id:
+        session.query(Order).filter(Order.id == r.order_id).delete()
+        session.commit()
+    session.query(Recipe).filter(Recipe.id == id_).delete()
+    session.commit()
+
+
 COMMANDS = {
     '------------ create commands ------------': 1,
     'create client': create_client_handler,
@@ -512,7 +527,9 @@ COMMANDS = {
     'get component price for medicine': get_component_price_for_medicine_handler,
     'get orders for most popular medicine': get_orders_for_most_popular_medicine_handler,  # 12
     'get full medicine info': get_full_medicine_info_handler,  # 13
-    '------------ system commands ------------': 5,
+    '------------ delete commands ------------': 5,
+    'delete recipe': delete_recipe,
+    '------------ system commands ------------': 6,
     'check readiness': order_service.check_readiness,
     'take order': take_order_handler,
     'exit': shut_down,

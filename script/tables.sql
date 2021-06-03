@@ -3,7 +3,7 @@ CREATE TABLE alembic_version (
     CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
 );
 
--- Running upgrade  -> c18ea807c434
+-- Running upgrade  -> 0d7476ad279c
 
 CREATE TABLE client (
     id INTEGER NOT NULL AUTO_INCREMENT, 
@@ -100,8 +100,8 @@ CREATE TABLE recipe (
     order_id INTEGER, 
     PRIMARY KEY (id), 
     FOREIGN KEY(client_id) REFERENCES client (id), 
-    FOREIGN KEY(order_id) REFERENCES orders (id)
+    FOREIGN KEY(order_id) REFERENCES orders (id) ON DELETE CASCADE
 );
 
-INSERT INTO alembic_version (version_num) VALUES ('c18ea807c434');
+INSERT INTO alembic_version (version_num) VALUES ('0d7476ad279c');
 

@@ -3,7 +3,7 @@ CREATE TABLE alembic_version (
     CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
 );
 
--- Running upgrade  -> 0d7476ad279c
+-- Running upgrade  -> c18ea807c434
 
 CREATE TABLE client (
     id INTEGER NOT NULL AUTO_INCREMENT, 
@@ -42,7 +42,7 @@ CREATE TABLE cooking_book (
     medicine_id INTEGER, 
     method ENUM('mixing','creaming'), 
     PRIMARY KEY (id), 
-    FOREIGN KEY(medicine_id) REFERENCES medicine (id)
+    FOREIGN KEY(medicine_id) REFERENCES medicine (id) ON DELETE CASCADE
 );
 
 CREATE TABLE critical_norm (
@@ -50,7 +50,7 @@ CREATE TABLE critical_norm (
     component_id INTEGER, 
     amount FLOAT, 
     PRIMARY KEY (id), 
-    FOREIGN KEY(component_id) REFERENCES component (id)
+    FOREIGN KEY(component_id) REFERENCES component (id) ON DELETE CASCADE
 );
 
 CREATE TABLE ingredient (
@@ -58,7 +58,7 @@ CREATE TABLE ingredient (
     component_id INTEGER, 
     dose FLOAT, 
     PRIMARY KEY (id), 
-    FOREIGN KEY(component_id) REFERENCES component (id)
+    FOREIGN KEY(component_id) REFERENCES component (id) ON DELETE CASCADE
 );
 
 CREATE TABLE orders (
@@ -66,10 +66,11 @@ CREATE TABLE orders (
     `status` ENUM('in_process','waiting_for_components','ready','closed') NOT NULL, 
     client_id INTEGER, 
     medicine_id INTEGER, 
-    date_created DATE NOT NULL, 
+    date_created DATE NOT NULL,
+    ready_time DATE,
     PRIMARY KEY (id), 
-    FOREIGN KEY(client_id) REFERENCES client (id), 
-    FOREIGN KEY(medicine_id) REFERENCES medicine (id)
+    FOREIGN KEY(client_id) REFERENCES client (id) ON DELETE CASCADE,
+    FOREIGN KEY(medicine_id) REFERENCES medicine (id) ON DELETE CASCADE
 );
 
 CREATE TABLE supply_request (
@@ -77,15 +78,15 @@ CREATE TABLE supply_request (
     component_id INTEGER, 
     client_id INTEGER, 
     PRIMARY KEY (id), 
-    FOREIGN KEY(client_id) REFERENCES client (id), 
-    FOREIGN KEY(component_id) REFERENCES component (id)
+    FOREIGN KEY(client_id) REFERENCES client (id) ON DELETE CASCADE,
+    FOREIGN KEY(component_id) REFERENCES component (id) ON DELETE CASCADE
 );
 
 CREATE TABLE ingredient_medicine (
     ingredient_id INTEGER, 
     medicine_id INTEGER, 
-    FOREIGN KEY(ingredient_id) REFERENCES ingredient (id), 
-    FOREIGN KEY(medicine_id) REFERENCES medicine (id)
+    FOREIGN KEY(ingredient_id) REFERENCES ingredient (id) ON DELETE CASCADE,
+    FOREIGN KEY(medicine_id) REFERENCES medicine (id) ON DELETE CASCADE
 );
 
 CREATE TABLE recipe (
@@ -95,13 +96,12 @@ CREATE TABLE recipe (
     client_id INTEGER, 
     diagnosis VARCHAR(255), 
     amount FLOAT, 
-    consumption_type ENUM('internal','external','mixing'), 
-    ready_time DATE, 
+    consumption_type ENUM('internal','external','mixing'),
     order_id INTEGER, 
     PRIMARY KEY (id), 
-    FOREIGN KEY(client_id) REFERENCES client (id), 
+    FOREIGN KEY(client_id) REFERENCES client (id) ON DELETE CASCADE,
     FOREIGN KEY(order_id) REFERENCES orders (id) ON DELETE CASCADE
 );
 
-INSERT INTO alembic_version (version_num) VALUES ('0d7476ad279c');
+INSERT INTO alembic_version (version_num) VALUES ('c18ea807c434');
 

@@ -17,13 +17,13 @@ def get_clients_with_not_taken_orders() -> t.List[Client]:
         .join(Client)
         .join(Order)
         .filter(Order.status == Order.STATUSES.ready)
-        .filter(Recipe.ready_time < date.today())
+        .filter(Order.ready_time < date.today())
     )
     return [r[1] for r in query.all()]
 
 
 # 2
-def get_clients_waiting_for_ingridients() -> t.List[Client]:
+def get_clients_waiting_for_ingredients() -> t.List[Client]:
     query = (
         session.query(Client, Order.status)
         .join(Client, Order.client_id == Client.id)
@@ -74,7 +74,7 @@ def get_component_used_amount(
 
 # 5
 def get_client_by_ordered_medicine_type(
-    type: MedicineType,
+    type_: MedicineType,
     start_date: t.Optional[date] = None,
     end_date: t.Optional[date] = None,
 ) -> t.List[Client]:
@@ -82,7 +82,7 @@ def get_client_by_ordered_medicine_type(
         session.query(Order, Medicine.type, Client)
         .join(Medicine)
         .join(Client)
-        .filter(Medicine.type == type)
+        .filter(Medicine.type == type_)
     )
     if start_date:
         query = query.filter(Order.date_created > start_date)
@@ -103,7 +103,7 @@ def get_components_with_critical_norm():
 
 # 7
 def get_medicine_with_minimal_components_amount(
-    type: t.Optional[MedicineType] = None
+    type_: t.Optional[MedicineType] = None
 ) -> t.List[str]:
     min_query = (
         session.query(func.min(Component.amount))
@@ -118,8 +118,8 @@ def get_medicine_with_minimal_components_amount(
         .filter(Component.amount == min_query)
     )
 
-    if type:
-        query = query.filter(Medicine.type == type)
+    if type_:
+        query = query.filter(Medicine.type == type_)
 
     return [r[0] for r in query.all()]
 
@@ -146,7 +146,7 @@ def get_medicine_in_waiting_for_components_status():
 
 
 # 10
-def get_cooking_book_for_madicine_name(
+def get_cooking_book_for_medicine_name(
     name: str
 ) -> t.Optional[CookingBook]:
     query = (
@@ -157,13 +157,13 @@ def get_cooking_book_for_madicine_name(
     return query.all()
 
 
-def get_cooking_book_for_madicine_type(
-    type: MedicineType
+def get_cooking_book_for_medicine_type(
+    type_: MedicineType
 ) -> t.Optional[CookingBook]:
     query = (
         session.query(CookingBook)
         .join(Medicine)
-        .filter(Medicine.type == type)
+        .filter(Medicine.type == type_)
     )
     return query.all()
 

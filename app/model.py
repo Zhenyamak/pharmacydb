@@ -18,7 +18,7 @@ ingredient_medicine = sa.Table(
     'ingredient_medicine',
     Base.metadata,
     sa.Column('ingredient_id', sa.Integer, sa.ForeignKey('ingredient.id')),
-    sa.Column('medicine_id', sa.Integer, sa.ForeignKey('medicine.id'))
+    sa.Column('medicine_id', sa.Integer, sa.ForeignKey('medicine.id', ondelete='CASCADE'))
 )
 
 
@@ -56,7 +56,7 @@ class Medicine(Base):
     type = sa.Column(sa.Enum(MedicineType))
 
     def __repr__(self):
-        return f'Medicine(id={self.id}, name={self.name})'
+        return f'Medicine(id={self.id}, name={self.name}, storage_time={self.storage_time}, amount={self.amount}, price={self.price}, ingredients={self.ingredients})'
 
 
 class Order(Base):
@@ -65,16 +65,16 @@ class Order(Base):
     STATUSES = OrderStatus
     id = sa.Column(sa.Integer, primary_key=True)
     status = sa.Column(sa.Enum(OrderStatus), nullable=False)
-    client_id = sa.Column(sa.Integer, sa.ForeignKey('client.id'))
+    client_id = sa.Column(sa.Integer, sa.ForeignKey('client.id', ondelete='CASCADE'))
     client = relationship('Client')
-    medicine_id = sa.Column(sa.Integer, sa.ForeignKey('medicine.id'))
+    medicine_id = sa.Column(sa.Integer, sa.ForeignKey('medicine.id', ondelete='CASCADE'))
     medicine = relationship('Medicine')
     date_created = sa.Column(sa.Date, nullable=False,
                              default=datetime.date.today)
 
     def __repr__(self) -> str:
         return (
-            f'Order(id={self.id}, status={self.status}, medicine_id={self.medicine_id}, date_created={self.date_created})'
+            f'Order(id={self.id}, status={self.status}, client_id={self.client_id}, medicine_id={self.medicine_id}, date_created={self.date_created})'
         )
 
 
@@ -84,7 +84,7 @@ class CookingBook(Base):
     METHODS_ENUM = CookingMethod
 
     id = sa.Column(sa.Integer, primary_key=True)
-    medicine_id = sa.Column(sa.Integer, sa.ForeignKey('medicine.id'))
+    medicine_id = sa.Column(sa.Integer, sa.ForeignKey('medicine.id', ondelete='CASCADE'))
     method = sa.Column(sa.Enum(CookingMethod))
 
     def __repr__(self):
@@ -128,7 +128,7 @@ class Recipe(Base):
     order_id = sa.Column(sa.Integer, sa.ForeignKey('orders.id', ondelete='CASCADE'))
 
     def __repr__(self):
-        return f'Recipe(id={self.id}, medicine_name={self.medicine_name}, client_id={self.client_id}, ready_time={self.ready_time})'
+        return f'Recipe(id={self.id}, medicine_name={self.medicine_name}, doctor={self.doctor}, client_id={self.client_id}, diagnosis={self.diagnosis}, consumption_type={self.consumption_type}, ready_time={self.ready_time}, order_id={self.order_id},)'
 
 
 class SupplyRequest(Base):
@@ -136,7 +136,7 @@ class SupplyRequest(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     component_id = sa.Column(sa.Integer, sa.ForeignKey('component.id'))
-    client_id = sa.Column(sa.Integer, sa.ForeignKey('client.id'))
+    client_id = sa.Column(sa.Integer, sa.ForeignKey('client.id', ondelete='CASCADE'))
     client = relationship('Client')
 
     def __repr__(self):

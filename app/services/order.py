@@ -78,6 +78,11 @@ def process_orders():
         .filter(Order.status == Order.STATUSES.waiting_for_components)
         .all()
     )
+    recipes_map = dict(
+        session.query(Recipe.order_id, Recipe)
+        .filter(Recipe.order_id.in_([o.id for o in orders]))
+        .all()
+    )
     medicine_ids = [o.medicine_id for o in orders]
     medicine_map = dict(
         session.query(Medicine.id, Medicine)
@@ -87,16 +92,23 @@ def process_orders():
     order_ids_to_update = []
     for o in orders:
         medicine = medicine_map[o.medicine_id]
-        components = [i.component for i in medicine.ingredients]
+        ingredients = medicine.ingredients
+        components = [i.component for i in ingredients]
         amount_check = all(
             [
                 is_component_amount_more(c, i)
-                for c, i in zip(components, medicine.ingredients)
+                for c, i in zip(components, ingredients)
             ]
         )
         if amount_check:
             order_ids_to_update.append(o.id)
-
+            recipe = recipes_map[o.id]
+            for ingredient in ingredients:
+                component = ingredient.component
+                set_component_amount(
+                    component.id,
+                    component.amount-recipe.amount * ingredient.dose
+                )
 
     (
         session.query(Order)
@@ -104,6 +116,3 @@ def process_orders():
         .update({'status': Order.STATUSES.in_process})
     )
     session.commit()
-
-
-process_orders()

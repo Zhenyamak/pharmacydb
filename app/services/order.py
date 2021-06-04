@@ -26,7 +26,7 @@ def create_order(
         client_id=recipe.client_id,
         medicine_id=medicine.id,
         status=OrderStatus.in_process,
-        ready_time = ready_time
+        ready_time=ready_time
     )
     for ingredient in medicine.ingredients:
         component = ingredient.component
@@ -35,7 +35,8 @@ def create_order(
             sr_service.create_supply_request(component.id, recipe.client_id)
             order.status = OrderStatus.waiting_for_components
         else:
-            set_component_amount(component.id, (component.amount-recipe.amount * ingredient.dose))
+            set_component_amount(
+                component.id, (component.amount-recipe.amount * ingredient.dose))
     session.add(order)
     session.commit()
     recipe.order_id = order.id
@@ -66,3 +67,43 @@ def check_readiness():
         .filter(Order.ready_time <= date.today())\
         .update({'status': Order.STATUSES.ready})
     session.commit()
+
+
+def process_orders():
+    def is_component_amount_more(component, ingredient):
+        return component.amount > ingredient.dose
+
+    orders = (
+        session.query(Order)
+        .filter(Order.status == Order.STATUSES.waiting_for_components)
+        .all()
+    )
+    medicine_ids = [o.medicine_id for o in orders]
+    medicine_map = dict(
+        session.query(Medicine.id, Medicine)
+        .filter(Medicine.id.in_(medicine_ids))
+        .all()
+    )
+    order_ids_to_update = []
+    for o in orders:
+        medicine = medicine_map[o.medicine_id]
+        components = [i.component for i in medicine.ingredients]
+        amount_check = all(
+            [
+                is_component_amount_more(c, i)
+                for c, i in zip(components, medicine.ingredients)
+            ]
+        )
+        if amount_check:
+            order_ids_to_update.append(o.id)
+
+
+    (
+        session.query(Order)
+        .filter(Order.id.in_(order_ids_to_update))
+        .update({'status': Order.STATUSES.in_process})
+    )
+    session.commit()
+
+
+process_orders()
